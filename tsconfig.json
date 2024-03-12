@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "module": "ES2022",
+        "outDir": "./dist",
+        "rootDir": "./src"
+    },
+    "exclude": [
+        "./configs",
+        "./coverage",
+        "./dist",
+        "./dist-*",
+        "./node_modules",
+        "./test-files",
+        "./ts.out"
+    ],
+    "extends": "virmator/base-configs/tsconfig.base.json"
+}
