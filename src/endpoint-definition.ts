@@ -60,8 +60,6 @@ type AllNestedKeys<Input extends ReadonlyDeep<AnyObject>> =
  *     // usage
  *     fetch(myEndpoints['https://my-api.example.com'].v1['get-value'].toString());
  *     fetch(String(myEndpoints['https://my-api.example.com'].v1['set-value']('my-value')));
- *
- * @readonly true
  */
 export function defineEndpoints<const Paths extends ReadonlyDeep<NestedPaths>>(
     nestedPaths: Exclude<AllNestedKeys<Paths>, string | typeof paramSymbol> extends never
