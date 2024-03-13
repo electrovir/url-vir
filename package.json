@@ -1,6 +1,6 @@
 {
     "name": "url-vir",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Url helpers",
     "keywords": [
         "url",
@@ -19,10 +19,11 @@
         "name": "electrovir",
         "url": "https://github.com/electrovir"
     },
-    "module": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "dist/cjs/index.js",
+    "module": "dist/esm/index.js",
+    "types": "dist/types/index.d.ts",
     "scripts": {
-        "compile": "virmator compile",
+        "compile": "rm -rf dist && tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
         "docs": "virmator docs",
         "format": "virmator format",
         "publish": "virmator publish \"npm run compile && npm run test:all\"",
