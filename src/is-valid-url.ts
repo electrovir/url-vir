@@ -1,6 +1,6 @@
 import {wrapInTry} from '@augment-vir/common';
 import {isRunTimeType} from 'run-time-assertions';
-import {UrlParts} from './url-builder';
+import {UrlParts} from './url-parts';
 
 /**
  * Checks if the given URL can be parsed by the `URL` class. Note that this is pretty strict: many
