@@ -89,7 +89,7 @@ export function buildUrl(
 
     const baseUrlParts = mapObjectValues(
         initUrlParts,
-        (key, baseValue): string | SearchParamsInput => {
+        (key, baseValue): string | SearchParamsInput | string[] => {
             if (!typedHasProperty(override, key)) {
                 return baseValue;
             }
@@ -110,7 +110,7 @@ export function buildUrl(
                 return baseValue;
             }
         },
-    ) as Record<keyof UrlParts, string | SearchParams> as UrlParts;
+    ) as Record<keyof UrlParts, string | SearchParams | string[]> as UrlParts;
 
     const initSearchParams: SearchParams = isRunTimeType(override.search, 'string')
         ? searchParamsToObject(addPrefix({value: override.search, prefix: '?'}))

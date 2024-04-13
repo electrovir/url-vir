@@ -10,6 +10,11 @@ export const mockUrlParts: UrlParts = {
     origin: 'https://example.com:8765',
     password: 'pass',
     pathname: '/path/1/2',
+    paths: [
+        'path',
+        '1',
+        '2',
+    ],
     port: '8765',
     protocol: 'https',
     search: '?hello=there&why',

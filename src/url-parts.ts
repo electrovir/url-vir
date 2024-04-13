@@ -26,6 +26,8 @@ export const urlPartsShape = defineShape({
      * be simply `'/'`.
      */
     pathname: '/',
+    /** Each path part of the pathname. */
+    paths: [''],
     /**
      * Everything after a ?, excluding the hash, as a string. If none exist, this will be an empty
      * string.
@@ -65,6 +67,7 @@ export const urlPartsShape = defineShape({
 export const emptyUrlParts = {
     ...urlPartsShape.defaultValue,
     searchParams: {},
+    paths: [],
 } as const satisfies UrlParts;
 
 /**

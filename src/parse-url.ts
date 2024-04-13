@@ -120,6 +120,9 @@ export function parseUrl(
 
     const searchParams = searchParamsToObject(search);
 
+    const relativePath = removePrefix({value: pathname, prefix: '/'});
+    const paths = relativePath ? relativePath.split('/') : [];
+
     return {
         hash,
         host,
@@ -128,6 +131,7 @@ export function parseUrl(
         origin,
         password,
         pathname,
+        paths,
         port,
         protocol,
         search,
