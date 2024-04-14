@@ -4,7 +4,7 @@ import {searchParamsToObject} from './search-params';
 import {UrlOptions, codeValue} from './url-options';
 import {UrlParts} from './url-parts';
 
-/** Combined the needed url parts into a URL's full href. */
+/** Combined the needed URL parts into a URL's full href. */
 export function createHref({
     hash,
     hostname,
@@ -25,13 +25,24 @@ export function createHref({
         username ? username + ':' : '',
         password ? password + '@' : '',
         createHost({hostname, port}),
+        createFullPath({hash, pathname, search}),
+    ].join('');
+}
+
+/** Combined the needed URL parts into a URL's `fullPath`. */
+export function createFullPath({
+    hash,
+    pathname,
+    search,
+}: Readonly<Pick<UrlParts, 'hash' | 'pathname' | 'search'>>) {
+    return [
         addPrefix({value: pathname, prefix: '/'}),
         search ? addPrefix({value: search, prefix: '?'}) : '',
         hash ? addPrefix({value: hash, prefix: '#'}) : '',
     ].join('');
 }
 
-/** Combined the needed url parts into a URL host. */
+/** Combined the needed URL parts into a URL host. */
 export function createHost({
     hostname,
     port,
@@ -42,7 +53,7 @@ export function createHost({
     ].join('');
 }
 
-/** Combined the needed url parts into a URL origin. */
+/** Combined the needed URL parts into a URL origin. */
 export function createOrigin({
     hostname,
     port,
@@ -124,6 +135,7 @@ export function parseUrl(
     const paths = relativePath ? relativePath.split('/') : [];
 
     return {
+        fullPath: createFullPath({hash, pathname, search}),
         hash,
         host,
         hostname,

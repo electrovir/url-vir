@@ -61,6 +61,7 @@ describe(parseUrl.name, () => {
                 ...mockUrlParts,
                 hash: '',
                 href: 'https://user:pass@example.com:8765/path/1/2?hello=there&why',
+                fullPath: '/path/1/2?hello=there&why',
             },
         },
         {
@@ -73,6 +74,7 @@ describe(parseUrl.name, () => {
                 href: 'https://user:pass@example.com:8765/path/1/2#time-to-go',
                 search: '',
                 searchParams: {},
+                fullPath: '/path/1/2#time-to-go',
             },
         },
         {
@@ -85,6 +87,7 @@ describe(parseUrl.name, () => {
                 href: 'https://user:pass@example.com:8765/?hello=there&why#time-to-go',
                 paths: [],
                 pathname: '/',
+                fullPath: '/?hello=there&why#time-to-go',
             },
         },
         {
@@ -117,6 +120,7 @@ describe(parseUrl.name, () => {
                     '1',
                     '2',
                 ],
+                fullPath: '/path/1/2',
                 port: '',
                 protocol: 'https',
                 search: '',
@@ -206,6 +210,7 @@ describe(parseUrl.name, () => {
                     '1',
                     '2',
                 ],
+                fullPath: '/example.com:8765/path/1/2?hello=there&why#time-to-go',
                 port: '',
                 protocol: '',
                 username: '',
@@ -230,6 +235,7 @@ describe(parseUrl.name, () => {
                     '1',
                     '2',
                 ],
+                fullPath: '/example.com:8765/path/1/2?hello=there&why#time-to-go',
                 port: '',
                 protocol: '',
                 username: '',

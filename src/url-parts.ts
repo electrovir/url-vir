@@ -3,16 +3,33 @@ import {searchParamsShape} from './search-params';
 
 /** Shape definition for `UrlParts`. */
 export const urlPartsShape = defineShape({
-    /** Everything after the hash (#). If none exist, this will be an empty string. */
-    hash: '',
+    /** Http, https, wss, etc. */
+    protocol: '',
     /**
-     * An object representation of the parameters contained within the search string. If none exist,
-     * it will be an empty object.
+     * Infrequently used username part of a url.
+     *
+     * @example
+     *     buildUrl('https://anonymous:my-pass@developer.mozilla.org').username === 'anonymous';
      */
-    searchParams: searchParamsShape,
-
-    /** The full url string. */
-    href: '/',
+    username: '',
+    /**
+     * Infrequently used password part of a url.
+     *
+     * @example
+     *     buildUrl('https://anonymous:my-pass@developer.mozilla.org').password === 'my-pass';
+     */
+    password: '',
+    /**
+     * Includes:
+     *
+     * - Hostname
+     * - Port
+     */
+    host: '',
+    /** Domain, subdomains, and TLD (.com). */
+    hostname: '',
+    /** Port part of the URL. If none exist, this will be an empty string. */
+    port: '',
     /**
      * Includes:
      *
@@ -33,34 +50,23 @@ export const urlPartsShape = defineShape({
      * string.
      */
     search: '',
-    /** Http, https, wss, etc. */
-    protocol: '',
+    /**
+     * An object representation of the parameters contained within the search string. If none exist,
+     * it will be an empty object.
+     */
+    searchParams: searchParamsShape,
+    /** Everything after the hash (#). If none exist, this will be an empty string. */
+    hash: '',
     /**
      * Includes:
      *
-     * - Hostname
-     * - Port
+     * - Pathname
+     * - Search
+     * - Hash
      */
-    host: '',
-    /** Domain, subdomains, and TLD (.com). */
-    hostname: '',
-    /** Port part of the URL. If none exist, this will be an empty string. */
-    port: '',
-
-    /**
-     * Infrequently used username part of a url.
-     *
-     * @example
-     *     buildUrl('https://anonymous:my-pass@developer.mozilla.org').username === 'anonymous';
-     */
-    username: '',
-    /**
-     * Infrequently used password part of a url.
-     *
-     * @example
-     *     buildUrl('https://anonymous:my-pass@developer.mozilla.org').password === 'my-pass';
-     */
-    password: '',
+    fullPath: '/',
+    /** The full url string. */
+    href: '/',
 });
 
 /** An example of empty `UrlParts` for convenience's sake. */

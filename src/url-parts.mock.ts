@@ -15,6 +15,7 @@ export const mockUrlParts: UrlParts = {
         '1',
         '2',
     ],
+    fullPath: '/path/1/2?hello=there&why#time-to-go',
     port: '8765',
     protocol: 'https',
     search: '?hello=there&why',
