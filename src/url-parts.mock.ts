@@ -21,7 +21,7 @@ export const mockUrlParts: UrlParts = {
     search: '?hello=there&why',
     searchParams: {
         hello: ['there'],
-        why: [''],
+        why: [],
     },
     username: 'user',
 };

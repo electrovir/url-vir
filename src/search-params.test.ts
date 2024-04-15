@@ -40,6 +40,15 @@ describe(searchParamsToString.name, () => {
             expect: '?a=five&b=four',
         },
         {
+            it: 'converts an empty array value into a bare param',
+            inputs: [
+                {
+                    a: [],
+                },
+            ],
+            expect: '?a',
+        },
+        {
             it: 'does not encode values by default',
             inputs: [{a: 'what,five'}],
             expect: '?a=what,five',
@@ -61,7 +70,7 @@ describe(searchParamsToString.name, () => {
             expect: '?a=what,-five',
         },
         {
-            it: 'filters out nullish values',
+            it: 'filters out null or undefined values',
             inputs: [
                 {
                     a: undefined,
@@ -97,7 +106,7 @@ describe(searchParamsToString.name, () => {
                     cheese: [''],
                 },
             ],
-            expect: '?hello=there&cheese',
+            expect: '?hello=there&cheese=',
         },
     ]);
 });
@@ -194,8 +203,16 @@ describe(searchParamsToObject.name, () => {
             expect: {},
         },
         {
-            it: 'works on example code',
+            it: 'returns an empty array for a search param with no values',
             inputs: ['?hello=there&cheese'],
+            expect: {
+                hello: ['there'],
+                cheese: [],
+            },
+        },
+        {
+            it: 'returns an empty string for a search param with nothing after =',
+            inputs: ['?hello=there&cheese='],
             expect: {
                 hello: ['there'],
                 cheese: [''],

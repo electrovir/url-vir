@@ -106,7 +106,7 @@ export function combineSearchParams(
  *     searchParamsToObject('?hello=there&cheese') ===
  *         {
  *             hello: ['there'],
- *             cheese: [''],
+ *             cheese: [],
  *         };
  */
 export function searchParamsToObject(
@@ -129,14 +129,15 @@ export function searchParamsToObject(
 
     const searchString = rawSearchString.replace(/^.*\?|\#.*$/, '');
 
-    const paramEntries = searchString.split('&').map((param): [string, string] => {
+    const paramEntries = searchString.split('&').map((param): [string, string | undefined] => {
         const [
             key,
             ...values
         ] = typedSplit(param, '=');
+
         return [
             key,
-            values.join('='),
+            values.length ? values.join('=') : undefined,
         ];
     });
 
@@ -152,12 +153,28 @@ export function searchParamsToObject(
 
             const existingKeyValue = getOrSet(accum, coded.key, () => []);
 
-            existingKeyValue.push(coded.value);
+            if (value != undefined) {
+                existingKeyValue.push(coded.value);
+            }
 
             return accum;
         },
         {},
     );
+}
+
+function wrapParamValue(
+    value: Primitive | ReadonlyArray<Primitive>,
+): ReadonlyArray<Primitive> | undefined {
+    if (value == undefined) {
+        return undefined;
+    } else if (isRunTimeType(value, 'array')) {
+        return [...value];
+    } else if (value === '') {
+        return [];
+    } else {
+        return [value];
+    }
 }
 
 /**
@@ -180,43 +197,29 @@ export function searchParamsToString(
     input: Readonly<SearchParamsInput>,
     options?: ReadonlyObjectDeep<UrlOptions> | undefined,
 ): string {
-    const entries: [string, Primitive][] = Object.entries(input).flatMap(
-        ([
-            key,
-            value,
-        ]): [string, Primitive][] => {
-            if (isRunTimeType(value, 'array')) {
-                return value.map((valueArrayEntry) => [
-                    key,
-                    valueArrayEntry,
-                ]);
-            } else {
-                return [
-                    [
-                        key,
-                        value,
-                    ],
-                ];
-            }
-        },
-    );
-
     /**
      * This does not use the global `URLSearchParams` class because that automatically encodes
      * params, which we want to leave up to the options input.
      */
-    const mappedValues = filterMap(
-        entries,
+    const mappedValues: string[] = filterMap(
+        Object.entries(input),
         ([
             key,
-            value,
-        ]) => {
-            const coded = codeParamKeyValue({options, key, value});
+            rawValue,
+        ]): string[] => {
+            const values = wrapParamValue(rawValue);
 
-            if (value === '') {
-                return coded.key;
+            if (values?.length) {
+                return values.map((value) => {
+                    const coded = codeParamKeyValue({options, key, value});
+
+                    return [
+                        coded.key,
+                        coded.value,
+                    ].join('=');
+                });
             } else {
-                return `${coded.key}=${coded.value}`;
+                return [key];
             }
         },
         (
@@ -226,7 +229,7 @@ export function searchParamsToString(
                 value,
             ],
         ) => value != undefined,
-    );
+    ).flat();
 
     if (!mappedValues.length) {
         return '';

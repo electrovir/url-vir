@@ -158,7 +158,7 @@ describe(buildUrl.name, () => {
                 searchParams: {
                     derp: ['hi'],
                     hello: ['there'],
-                    why: [''],
+                    why: [],
                 },
                 href: 'https://user:pass@example.com:8765/path/1/2?hello=there&why&derp=hi#time-to-go',
             },
