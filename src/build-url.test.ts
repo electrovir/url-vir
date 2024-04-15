@@ -18,6 +18,7 @@ describe(buildUrl.name, () => {
                 ...emptyUrlParts,
                 hash: '#hello',
                 href: '/#hello',
+                fullPath: '/#hello',
             },
         },
         {
@@ -35,6 +36,7 @@ describe(buildUrl.name, () => {
                     derp: ['hi'],
                 },
                 href: '/?derp=hi',
+                fullPath: '/?derp=hi',
             },
         },
         {
@@ -49,6 +51,7 @@ describe(buildUrl.name, () => {
                 ...emptyUrlParts,
                 hash: '#hello',
                 href: '/#hello',
+                fullPath: '/#hello',
             },
         },
         {
@@ -66,6 +69,7 @@ describe(buildUrl.name, () => {
                     derp: ['hi'],
                 },
                 href: '/?derp=hi',
+                fullPath: '/?derp=hi',
             },
         },
         {
@@ -102,6 +106,28 @@ describe(buildUrl.name, () => {
                 href: 'https://example.com/no-slash',
                 protocol: 'https',
                 pathname: '/no-slash',
+                paths: ['no-slash'],
+                fullPath: '/no-slash',
+            },
+        },
+        {
+            it: 'adds paths',
+            inputs: [
+                'https://example.com',
+                {
+                    paths: ['new-path'],
+                },
+            ],
+            expect: {
+                ...emptyUrlParts,
+                fullPath: '/new-path',
+                paths: ['new-path'],
+                host: 'example.com',
+                hostname: 'example.com',
+                origin: 'https://example.com',
+                href: 'https://example.com/new-path',
+                protocol: 'https',
+                pathname: '/new-path',
             },
         },
         {

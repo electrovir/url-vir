@@ -29,6 +29,12 @@ export function createHref({
     ].join('');
 }
 
+/** Split `pathname` into `paths`. */
+export function createPaths({pathname}: Readonly<Pick<UrlParts, 'pathname'>>) {
+    const relativePath = removePrefix({value: pathname, prefix: '/'});
+    return relativePath ? relativePath.split('/') : [];
+}
+
 /** Combined the needed URL parts into a URL's `fullPath`. */
 export function createFullPath({
     hash,
@@ -130,9 +136,7 @@ export function parseUrl(
     });
 
     const searchParams = searchParamsToObject(search);
-
-    const relativePath = removePrefix({value: pathname, prefix: '/'});
-    const paths = relativePath ? relativePath.split('/') : [];
+    const paths = createPaths({pathname});
 
     return {
         fullPath: createFullPath({hash, pathname, search}),

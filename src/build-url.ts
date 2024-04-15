@@ -5,9 +5,17 @@ import {
     mapObjectValues,
     typedHasProperty,
 } from '@augment-vir/common';
-import {isRunTimeType} from 'run-time-assertions';
+import {hasProperty, isRunTimeType} from 'run-time-assertions';
 import {ReadonlyObjectDeep} from 'type-fest/source/readonly-deep';
-import {createHost, createHref, createOrigin, parseUrl} from './parse-url';
+import {joinUrlParts} from './join-url-parts';
+import {
+    createFullPath,
+    createHost,
+    createHref,
+    createOrigin,
+    createPaths,
+    parseUrl,
+} from './parse-url';
 import {
     SearchParams,
     SearchParamsInput,
@@ -24,6 +32,7 @@ export type UrlOverrides = PartialAndUndefined<{
     search?: string | SearchParamsInput;
     hostname?: string;
     pathname?: string;
+    paths?: string[];
     protocol?: string;
     username?: string;
     password?: string;
@@ -94,23 +103,27 @@ export function buildUrl(
                 return baseValue;
             }
 
-            const initPart = override[key];
+            const overridePart = override[key];
 
-            if (isRunTimeType(initPart, 'number')) {
-                return String(initPart);
-            } else if (isRunTimeType(initPart, 'string')) {
-                if (key === 'hash' && initPart) {
-                    return addPrefix({value: initPart, prefix: '#'});
+            if (isRunTimeType(overridePart, 'number')) {
+                return String(overridePart);
+            } else if (isRunTimeType(overridePart, 'string')) {
+                if (key === 'hash' && overridePart) {
+                    return addPrefix({value: overridePart, prefix: '#'});
                 } else if (key === 'pathname') {
-                    return addPrefix({value: initPart, prefix: '/'});
+                    return addPrefix({value: overridePart, prefix: '/'});
                 } else {
-                    return initPart;
+                    return overridePart;
                 }
             } else {
                 return baseValue;
             }
         },
     ) as Record<keyof UrlParts, string | SearchParams | string[]> as UrlParts;
+
+    if (hasProperty(override, 'paths') && override.paths) {
+        baseUrlParts.pathname = joinUrlParts('', ...override.paths);
+    }
 
     const initSearchParams: SearchParams = isRunTimeType(override.search, 'string')
         ? searchParamsToObject(addPrefix({value: override.search, prefix: '?'}))
@@ -124,6 +137,8 @@ export function buildUrl(
         ...baseUrlParts,
         searchParams,
         search,
+        paths: createPaths(baseUrlParts),
+        fullPath: createFullPath(baseUrlParts),
         host: createHost(baseUrlParts),
         origin: createOrigin(baseUrlParts),
         href: createHref({
