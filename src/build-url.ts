@@ -23,7 +23,7 @@ import {
     searchParamsToObject,
     searchParamsToString,
 } from './search-params';
-import {UrlOptions} from './url-options';
+import {UrlEncoding, UrlOptions} from './url-options';
 import {UrlParts} from './url-parts';
 
 /** Overrides input for `buildUrl`. */
@@ -129,7 +129,10 @@ export function buildUrl(
         ? searchParamsToObject(addPrefix({value: override.search, prefix: '?'}))
         : copyThroughJson((override.search || {}) as SearchParams);
 
-    const searchParams = combineSearchParams(baseUrlParts.searchParams, initSearchParams, options);
+    const searchParams = combineSearchParams(baseUrlParts.searchParams, initSearchParams, {
+        ...options,
+        encoding: UrlEncoding.None,
+    });
 
     const search = searchParamsToString(searchParams, options);
 

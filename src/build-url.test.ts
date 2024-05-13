@@ -1,6 +1,7 @@
 import {itCases} from '@augment-vir/browser-testing';
 import {assert} from '@open-wc/testing';
 import {buildUrl} from './build-url';
+import {SearchParamStrategy, UrlEncoding} from './url-options';
 import {emptyUrlParts} from './url-parts';
 import {mockUrlParts, mockUrlString} from './url-parts.mock';
 
@@ -190,6 +191,29 @@ describe(buildUrl.name, () => {
             },
         },
         {
+            it: 'does not encode twice',
+            inputs: [
+                mockUrlString,
+                {
+                    search: {
+                        something: '+4',
+                    },
+                },
+                {
+                    encoding: UrlEncoding.Encode,
+                    searchParamStrategy: SearchParamStrategy.Clear,
+                },
+            ],
+            expect: {
+                ...mockUrlParts,
+                search: '?something=%2B4',
+                searchParams: {
+                    something: ['+4'],
+                },
+                href: 'https://user:pass@example.com:8765/path/1/2?something=%2B4#time-to-go',
+            },
+        },
+        {
             it: 'overwrites an existing domain',
             inputs: [
                 mockUrlString,
@@ -207,27 +231,6 @@ describe(buildUrl.name, () => {
         },
     ]);
 
-    it('handles missing base string input', () => {
-        assert.deepStrictEqual(
-            buildUrl({
-                hostname: 'example.com',
-                search: {
-                    hello: 'there',
-                },
-            }),
-            {
-                ...emptyUrlParts,
-                hostname: 'example.com',
-                href: 'example.com/?hello=there',
-                origin: 'example.com',
-                host: 'example.com',
-                searchParams: {
-                    hello: ['there'],
-                },
-                search: '?hello=there',
-            },
-        );
-    });
     it('handles missing base string input', () => {
         assert.deepStrictEqual(
             buildUrl({
