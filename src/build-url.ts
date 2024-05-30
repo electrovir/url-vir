@@ -62,7 +62,7 @@ export function buildUrl(
  *   - Search param values are not automatically encoded.
  */
 export function buildUrl(
-    baseString: string,
+    baseUrl: string | URL,
     override: ReadonlyObjectDeep<UrlOverrides>,
     options?: ReadonlyObjectDeep<UrlOptions> | undefined,
 ): UrlParts;
@@ -74,27 +74,28 @@ export function buildUrl(
  *   - Search param values are not automatically encoded.
  */
 export function buildUrl(
-    baseStringOrOverride: string | ReadonlyObjectDeep<UrlOverrides>,
+    baseUrlOrOverride: string | URL | ReadonlyObjectDeep<UrlOverrides>,
     overrideOrOptions?:
         | ReadonlyObjectDeep<UrlOverrides>
         | ReadonlyObjectDeep<UrlOptions>
         | undefined,
     maybeOptions?: ReadonlyObjectDeep<UrlOptions> | undefined,
 ): UrlParts {
-    const baseString: string = isRunTimeType(baseStringOrOverride, 'string')
-        ? baseStringOrOverride
-        : '';
-    const override: ReadonlyObjectDeep<UrlOverrides> = isRunTimeType(baseStringOrOverride, 'string')
-        ? (overrideOrOptions as Readonly<UrlOverrides>)
-        : baseStringOrOverride;
-    const options: ReadonlyObjectDeep<UrlOptions> | undefined = isRunTimeType(
-        baseStringOrOverride,
-        'string',
-    )
-        ? maybeOptions
-        : (overrideOrOptions as Readonly<UrlOptions> | undefined);
+    const baseUrl: string = isRunTimeType(baseUrlOrOverride, 'string')
+        ? baseUrlOrOverride
+        : baseUrlOrOverride instanceof URL
+          ? baseUrlOrOverride.toString()
+          : '';
+    const override: ReadonlyObjectDeep<UrlOverrides> =
+        isRunTimeType(baseUrlOrOverride, 'string') || baseUrlOrOverride instanceof URL
+            ? (overrideOrOptions as Readonly<UrlOverrides>)
+            : baseUrlOrOverride;
+    const options: ReadonlyObjectDeep<UrlOptions> | undefined =
+        isRunTimeType(baseUrlOrOverride, 'string') || baseUrlOrOverride instanceof URL
+            ? maybeOptions
+            : (overrideOrOptions as Readonly<UrlOptions> | undefined);
 
-    const initUrlParts = parseUrl(baseString);
+    const initUrlParts = parseUrl(baseUrl);
 
     const baseUrlParts = mapObjectValues(
         initUrlParts,

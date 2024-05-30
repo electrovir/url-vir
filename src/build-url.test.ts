@@ -170,6 +170,35 @@ describe(buildUrl.name, () => {
             },
         },
         {
+            it: 'works with a URL object input',
+            inputs: [
+                new URL('https://example.com'),
+                {
+                    search: {
+                        derp: 'hi',
+                    },
+                },
+            ],
+            expect: {
+                protocol: 'https',
+                username: '',
+                password: '',
+                host: 'example.com',
+                hostname: 'example.com',
+                port: '',
+                origin: 'https://example.com',
+                pathname: '/',
+                paths: [],
+                hash: '',
+                fullPath: '/',
+                search: '?derp=hi',
+                searchParams: {
+                    derp: ['hi'],
+                },
+                href: 'https://example.com/?derp=hi',
+            },
+        },
+        {
             it: 'adds search params to an existing url',
             inputs: [
                 mockUrlString,
