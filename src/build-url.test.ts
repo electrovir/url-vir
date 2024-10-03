@@ -1,9 +1,9 @@
-import {itCases} from '@augment-vir/browser-testing';
-import {assert} from '@open-wc/testing';
-import {buildUrl} from './build-url';
-import {SearchParamStrategy, UrlEncoding} from './url-options';
-import {emptyUrlParts} from './url-parts';
-import {mockUrlParts, mockUrlString} from './url-parts.mock';
+import {assert} from '@augment-vir/assert';
+import {describe, it, itCases} from '@augment-vir/test';
+import {buildUrl} from './build-url.js';
+import {SearchParamStrategy, UrlEncoding} from './url-options.js';
+import {emptyUrlParts} from './url-parts.js';
+import {mockUrlParts, mockUrlString} from './url-parts.mock.js';
 
 describe(buildUrl.name, () => {
     itCases(buildUrl, [
@@ -261,7 +261,7 @@ describe(buildUrl.name, () => {
     ]);
 
     it('handles missing base string input', () => {
-        assert.deepStrictEqual(
+        assert.deepEquals(
             buildUrl({
                 hostname: 'example.com',
                 search: {

@@ -1,18 +1,22 @@
+import {check} from '@augment-vir/assert';
 import {
     addPrefix,
     filterMap,
     filterObject,
     getOrSet,
     mapObjectValues,
-    typedSplit,
+    safeSplit,
 } from '@augment-vir/common';
 import {defineShape, indexedKeys} from 'object-shape-tester';
-import {isRunTimeType} from 'run-time-assertions';
 import {Primitive} from 'type-fest';
 import {ReadonlyObjectDeep} from 'type-fest/source/readonly-deep';
-import {SearchParamStrategy, UrlOptions, codeValue, codeValues} from './url-options';
+import {SearchParamStrategy, UrlOptions, codeValue, codeValues} from './url-options.js';
 
-/** Shape definition for `SearchParams`. */
+/**
+ * Shape definition for `SearchParams`.
+ *
+ * @category Util
+ */
 export const searchParamsShape = defineShape(
     indexedKeys({
         keys: '',
@@ -24,19 +28,23 @@ export const searchParamsShape = defineShape(
 /**
  * Key-value storage for URL search parameters.
  *
- * @category Primary Exports
+ * @category Type
  */
-export type SearchParams = typeof searchParamsShape.runTimeType;
+export type SearchParams = typeof searchParamsShape.runtimeType;
 
 /**
  * Less strict version of `SearchParams` that allows string or undefined values for overriding or
  * setting search params.
+ *
+ * @category Internal
  */
 export type SearchParamsInput = Record<string, Primitive | ReadonlyArray<Primitive>>;
 
 /**
  * Combine two objects of search params. Configure the combination strategy using the third
  * `options` input.
+ *
+ * @category Util
  */
 export function combineSearchParams(
     baseParams: Readonly<SearchParamsInput>,
@@ -47,7 +55,7 @@ export function combineSearchParams(
         options?.searchParamStrategy === SearchParamStrategy.Clear
             ? {}
             : mapObjectValues(baseParams, (key, value) => {
-                  if (isRunTimeType(value, 'string')) {
+                  if (check.isString(value)) {
                       return [value];
                   } else {
                       return value;
@@ -59,10 +67,10 @@ export function combineSearchParams(
         (paramKey, newValue): ReadonlyArray<string | undefined> | undefined => {
             if (options?.searchParamStrategy === SearchParamStrategy.Append) {
                 const baseValue = actualBaseParams[paramKey];
-                const baseValueArray = isRunTimeType(baseValue, 'array') ? baseValue : [baseValue];
+                const baseValueArray = check.isArray(baseValue) ? baseValue : [baseValue];
 
                 if (newValue) {
-                    const newValueArray = isRunTimeType(newValue, 'array') ? newValue : [newValue];
+                    const newValueArray = check.isArray(newValue) ? newValue : [newValue];
 
                     return codeValues(
                         [
@@ -74,7 +82,7 @@ export function combineSearchParams(
                 } else {
                     return codeValues(baseValueArray, options);
                 }
-            } else if (isRunTimeType(newValue, 'array')) {
+            } else if (check.isArray(newValue)) {
                 return codeValues(newValue, options);
             } else if (newValue) {
                 return codeValues([newValue], options);
@@ -101,19 +109,20 @@ export function combineSearchParams(
  * Convert a search param string, `URL` instance, or `URLSearchParams` instance into an object of
  * search params. Note that a search param string _must_ start with `'?'`.
  *
- * @category Primary Exports
+ * @category Main
  * @example
- *     searchParamsToObject('?hello=there&cheese') ===
- *         {
- *             hello: ['there'],
- *             cheese: [],
- *         };
+ *
+ * ```ts
+ * import {searchParamsToObject} from 'url-vir';
+ *
+ * searchParamsToObject('?hello=there&cheese'); // `{hello: ['there'], cheese: []}`
+ * ```
  */
 export function searchParamsToObject(
-    input: string | ReadonlyObjectDeep<Pick<URL, 'searchParams'>> | URLSearchParams,
+    input: string | Readonly<Pick<URL, 'search'>> | URLSearchParams,
     options?: ReadonlyObjectDeep<UrlOptions> | undefined,
 ): SearchParams {
-    if (isRunTimeType(input, 'string') && !input.includes('?')) {
+    if (check.isString(input) && !input.includes('?')) {
         return {};
     }
 
@@ -121,19 +130,19 @@ export function searchParamsToObject(
      * This does not use the global `URLSearchParams` class because that automatically encodes
      * params, which we want to leave up to the consumer.
      */
-    const rawSearchString: string = isRunTimeType(input, 'string')
+    const rawSearchString: string = check.isString(input)
         ? input
-        : input instanceof URL
-          ? input.search
-          : input.toString();
+        : input instanceof URLSearchParams
+          ? input.toString()
+          : input.search;
 
-    const searchString = rawSearchString.replace(/^.*\?|\#.*$/, '');
+    const searchString = rawSearchString.replace(/(^.*\?)|(#[^#]*$)/, '');
 
     const paramEntries = searchString.split('&').map((param): [string, string | undefined] => {
         const [
             key,
             ...values
-        ] = typedSplit(param, '=');
+        ] = safeSplit(param, '=');
 
         return [
             key,
@@ -168,7 +177,7 @@ function wrapParamValue(
 ): ReadonlyArray<Primitive> | undefined {
     if (value == undefined) {
         return undefined;
-    } else if (isRunTimeType(value, 'array')) {
+    } else if (check.isArray(value)) {
         return [...value];
     } else if (value === '') {
         return [];
@@ -186,12 +195,14 @@ function wrapParamValue(
  * - The leading `'?'` is included in the return string.
  * - If no key-value pairs are included, this returns an empty string.
  *
- * @category Primary Exports
+ * @category Main
  * @example
- *     searchParamsToObject({
- *         hello: ['there'],
- *         cheese: [''],
- *     }) === '?hello=there&cheese';
+ *
+ * ```ts
+ * import {searchParamsToString} from 'url-vir';
+ *
+ * searchParamsToString({hello: ['there'], cheese: ['']}); // `'?hello=there&cheese'`
+ * ```
  */
 export function searchParamsToString(
     input: Readonly<SearchParamsInput>,

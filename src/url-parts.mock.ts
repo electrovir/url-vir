@@ -1,4 +1,6 @@
-import {UrlParts} from './url-parts';
+/* eslint-disable sonarjs/no-hardcoded-credentials */
+
+import {UrlParts} from './url-parts.js';
 
 export const mockUrlString =
     'https://user:pass@example.com:8765/path/1/2?hello=there&why#time-to-go';

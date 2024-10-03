@@ -1,5 +1,5 @@
-import {itCases} from '@augment-vir/browser-testing';
-import {isValidUrl} from './is-valid-url';
+import {describe, itCases} from '@augment-vir/test';
+import {isValidUrl} from './is-valid-url.js';
 
 describe(isValidUrl.name, () => {
     itCases(isValidUrl, [

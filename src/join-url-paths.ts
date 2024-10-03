@@ -3,15 +3,20 @@ import {removePrefix} from '@augment-vir/common';
 const protocolSplit = '://';
 
 /**
- * Joins all given arguments together as if they were parts of a URL. Preserves trailing slashes and
- * removes consecutive slashes in the path.
+ * Joins all given arguments together as if they were paths of a URL. Preserves trailing slashes and
+ * removes consecutive slashes in the path. For more complex URL building, use `buildUrl`.
  *
- * @category Primary Exports
+ * @category Main
  * @example
- *     joinToUrl('https://example.com', 'path1', 'path2/', '/path3/') ===
- *         'https://example.com/path1/path2/path3/';
+ *
+ * ```ts
+ * import {joinUrlPaths} from 'url-vir';
+ *
+ * joinUrlPaths('https://example.com', 'path1', 'path2/', '/path3/');
+ * // `'https://example.com/path1/path2/path3/'`
+ * ```
  */
-export function joinUrlParts(...urlParts: ReadonlyArray<string>): string {
+export function joinUrlPaths(...urlParts: ReadonlyArray<string>): string {
     const rawJoined = urlParts.join('/');
     const [
         protocol,

@@ -1,22 +1,26 @@
 import {defineShape} from 'object-shape-tester';
-import {searchParamsShape} from './search-params';
+import {searchParamsShape} from './search-params.js';
 
-/** Shape definition for `UrlParts`. */
+/**
+ * Shape definition for {@link UrlParts} for use with the
+ * [`object-shape-tester`](https://www.npmjs.com/package/object-shape-tester) package.
+ *
+ * @category Util
+ */
 export const urlPartsShape = defineShape({
     /** Http, https, wss, etc. */
     protocol: '',
     /**
      * Infrequently used username part of a url.
      *
-     * @example
-     *     buildUrl('https://anonymous:my-pass@developer.mozilla.org').username === 'anonymous';
+     * @example BuildUrl('https://anonymous:my-pass@developer.mozilla.org').username ===
+     * 'anonymous';
      */
     username: '',
     /**
      * Infrequently used password part of a url.
      *
-     * @example
-     *     buildUrl('https://anonymous:my-pass@developer.mozilla.org').password === 'my-pass';
+     * @example BuildUrl('https://anonymous:my-pass@developer.mozilla.org').password === 'my-pass';
      */
     password: '',
     /**
@@ -69,7 +73,11 @@ export const urlPartsShape = defineShape({
     href: '/',
 });
 
-/** An example of empty `UrlParts` for convenience's sake. */
+/**
+ * An example of empty `UrlParts` for convenience's sake.
+ *
+ * @category Util
+ */
 export const emptyUrlParts = {
     ...urlPartsShape.defaultValue,
     searchParams: {},
@@ -79,6 +87,6 @@ export const emptyUrlParts = {
 /**
  * The output of `buildUrl`. See its docs for more details.
  *
- * @category Primary Exports
+ * @category Type
  */
-export type UrlParts = typeof urlPartsShape.runTimeType;
+export type UrlParts = typeof urlPartsShape.runtimeType;

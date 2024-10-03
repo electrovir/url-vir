@@ -1,10 +1,14 @@
-import {addPrefix, isTruthy, removePrefix} from '@augment-vir/common';
-import {isRunTimeType} from 'run-time-assertions';
-import {searchParamsToObject} from './search-params';
-import {UrlOptions, codeValue} from './url-options';
-import {UrlParts} from './url-parts';
+import {check} from '@augment-vir/assert';
+import {addPrefix, removePrefix} from '@augment-vir/common';
+import {searchParamsToObject} from './search-params.js';
+import {UrlOptions, codeValue} from './url-options.js';
+import {UrlParts} from './url-parts.js';
 
-/** Combined the needed URL parts into a URL's full href. */
+/**
+ * Combined the needed URL parts into a URL's full href.
+ *
+ * @category Internal
+ */
 export function createHref({
     hash,
     hostname,
@@ -29,13 +33,21 @@ export function createHref({
     ].join('');
 }
 
-/** Split `pathname` into `paths`. */
+/**
+ * Split `pathname` into `paths`.
+ *
+ * @category Internal
+ */
 export function createPaths({pathname}: Readonly<Pick<UrlParts, 'pathname'>>) {
     const relativePath = removePrefix({value: pathname, prefix: '/'});
     return relativePath ? relativePath.split('/') : [];
 }
 
-/** Combined the needed URL parts into a URL's `fullPath`. */
+/**
+ * Combined the needed URL parts into a URL's `fullPath`.
+ *
+ * @category Internal
+ */
 export function createFullPath({
     hash,
     pathname,
@@ -48,7 +60,11 @@ export function createFullPath({
     ].join('');
 }
 
-/** Combined the needed URL parts into a URL host. */
+/**
+ * Combined the needed URL parts into a URL host.
+ *
+ * @category Internal
+ */
 export function createHost({
     hostname,
     port,
@@ -59,7 +75,11 @@ export function createHost({
     ].join('');
 }
 
-/** Combined the needed URL parts into a URL origin. */
+/**
+ * Combined the needed URL parts into a URL origin.
+ *
+ * @category Internal
+ */
 export function createOrigin({
     hostname,
     port,
@@ -72,31 +92,59 @@ export function createOrigin({
             port,
         }),
     ]
-        .filter(isTruthy)
+        .filter(check.isTruthy)
         .join('://');
 }
 
 /**
- * Converts a string or `URL` instance into `UrlParts`.
+ * Converts a string or `URL` instance into {@link UrlParts}.
  *
  * - Partial URLs are valid. Whatever you don't provide will be empty in the returned object.
  * - Encoding options are only applied to pathname, search, and hash url parts.
  *
- * @category Primary Exports
+ * @category Main
+ * @example
+ *
+ * ```ts
+ * import {parseUrl} from 'url-vir';
+ *
+ * let result = parseUrl('https://example.com:123/hello/there');
+ *
+ * // output
+ * result = {
+ *     protocol: 'https',
+ *     username: '',
+ *     password: '',
+ *     host: 'example.com:123',
+ *     hostname: 'example.com',
+ *     port: '123',
+ *     origin: 'https://example.com:123',
+ *     pathname: '/hello/there',
+ *     paths: [
+ *         'hello',
+ *         'there',
+ *     ],
+ *     search: '',
+ *     searchParams: {},
+ *     hash: '',
+ *     fullPath: '/hello/there',
+ *     href: 'https://example.com:123/hello/there',
+ * };
+ * ```
  */
 export function parseUrl(
     url: string | URL,
     options?: Readonly<Pick<UrlOptions, 'encoding'>> | undefined,
 ): UrlParts {
-    const urlString = isRunTimeType(url, 'string') ? url : url.toString();
+    const urlString = check.isString(url) ? url : url.toString();
 
     const rawHash = urlString.replace(/^[^#]*(?:#|$)/, '');
     const hash = rawHash ? addPrefix({value: codeValue(rawHash, options), prefix: '#'}) : '';
-    const withoutHash = urlString.replace(/#.*$/, '');
+    const withoutHash = urlString.replace(/#[^#]*$/, '');
 
-    const rawSearch = withoutHash.replace(/^[^\?]*(?:\?|$)/, '');
+    const rawSearch = withoutHash.replace(/^[^?]*(?:\?|$)/, '');
     const search = rawSearch ? addPrefix({value: codeValue(rawSearch, options), prefix: '?'}) : '';
-    const withoutSearch = withoutHash.replace(/\?.*$/, '');
+    const withoutSearch = withoutHash.replace(/\?[^?]*$/, '');
 
     const protocol = withoutSearch.includes('://') ? withoutSearch.replace(/:\/\/.*$/, '') : '';
     const withoutProtocol = withoutSearch
@@ -110,15 +158,15 @@ export function parseUrl(
         rawPassword,
         ...rawUsernameParts
     ] = hasLogin ? login.split(':').reverse() : [];
-    const username = rawUsernameParts.reverse().join('').replace(/[\/:]/g, '') || '';
-    const password = rawPassword?.replace(/[\/:]/g, '') || '';
+    const username = rawUsernameParts.toReversed().join('').replace(/[/:]/g, '') || '';
+    const password = rawPassword?.replace(/[/:]/g, '') || '';
 
-    const hostname = withoutLogin.replace(/[:\/].*/, '');
-    const withoutHost = withoutLogin.replace(/^[^\/:]*(\:|\/|$)/, '$1');
+    const hostname = withoutLogin.replace(/[:/].*/, '');
+    const withoutHost = withoutLogin.replace(/^[^/:]*(:|\/|$)/, '$1');
 
-    const port = removePrefix({value: withoutHost.replace(/\/.*$/, ''), prefix: ':'});
+    const port = removePrefix({value: withoutHost.replace(/\/.*/, ''), prefix: ':'});
 
-    const pathname = codeValue(withoutHost.replace(/^[^\/]*(?:\/|$)/, '/'), options);
+    const pathname = codeValue(withoutHost.replace(/^[^/]*(?:\/|$)/, '/'), options);
 
     const host = createHost({hostname, port});
 

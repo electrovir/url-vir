@@ -1,7 +1,7 @@
-import {itCases} from '@augment-vir/browser-testing';
-import {assertTypeOf} from 'run-time-assertions';
-import {combineSearchParams, searchParamsToObject, searchParamsToString} from './search-params';
-import {SearchParamStrategy, UrlEncoding} from './url-options';
+import {assert} from '@augment-vir/assert';
+import {describe, it, itCases} from '@augment-vir/test';
+import {combineSearchParams, searchParamsToObject, searchParamsToString} from './search-params.js';
+import {SearchParamStrategy, UrlEncoding} from './url-options.js';
 
 const exampleUrl = 'https://example.com?a=what&b=five&who=you';
 const exampleUrlSearchParams = {
@@ -113,7 +113,7 @@ describe(searchParamsToString.name, () => {
 
 describe(searchParamsToObject.name, () => {
     it('has proper types', () => {
-        assertTypeOf(searchParamsToObject(exampleUrl)).toEqualTypeOf<Record<string, string[]>>();
+        assert.tsType(searchParamsToObject(exampleUrl)).equals<Record<string, string[]>>();
     });
 
     itCases(searchParamsToObject, [

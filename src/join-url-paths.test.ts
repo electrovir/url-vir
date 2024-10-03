@@ -1,8 +1,8 @@
-import {itCases} from '@augment-vir/browser-testing';
-import {joinUrlParts} from './join-url-parts';
+import {describe, itCases} from '@augment-vir/test';
+import {joinUrlPaths} from './join-url-paths.js';
 
-describe(joinUrlParts.name, () => {
-    itCases(joinUrlParts, [
+describe(joinUrlPaths.name, () => {
+    itCases(joinUrlPaths, [
         {
             it: 'formats simple url without encoding',
             inputs: [
@@ -107,6 +107,15 @@ describe(joinUrlParts.name, () => {
                 're-hash',
             ],
             expect: 'https://wikipedia.org/start/end/actual end?stuff=some-hash#hash-stuff-here-hash',
+        },
+        {
+            it: 'does not handle bare protocol',
+            inputs: [
+                'https',
+                'wikipedia.org',
+                'start',
+            ],
+            expect: 'https/wikipedia.org/start',
         },
     ]);
 });

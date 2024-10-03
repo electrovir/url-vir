@@ -1,7 +1,9 @@
-import {itCases} from '@augment-vir/browser-testing';
-import {createHref, parseUrl} from './parse-url';
-import {emptyUrlParts} from './url-parts';
-import {mockUrlParts, mockUrlString} from './url-parts.mock';
+/* eslint-disable sonarjs/no-hardcoded-credentials */
+
+import {describe, itCases} from '@augment-vir/test';
+import {createHref, parseUrl} from './parse-url.js';
+import {emptyUrlParts} from './url-parts.js';
+import {mockUrlParts, mockUrlString} from './url-parts.mock.js';
 
 describe(parseUrl.name, () => {
     itCases(parseUrl, [
@@ -270,6 +272,31 @@ describe(parseUrl.name, () => {
                 href: 'https://example.com/',
                 origin: 'https://example.com',
                 protocol: 'https',
+            },
+        },
+        {
+            it: 'handles example url',
+            inputs: [
+                'https://example.com:123/hello/there',
+            ],
+            expect: {
+                protocol: 'https',
+                username: '',
+                password: '',
+                host: 'example.com:123',
+                hostname: 'example.com',
+                port: '123',
+                origin: 'https://example.com:123',
+                pathname: '/hello/there',
+                paths: [
+                    'hello',
+                    'there',
+                ],
+                search: '',
+                searchParams: {},
+                hash: '',
+                fullPath: '/hello/there',
+                href: 'https://example.com:123/hello/there',
             },
         },
     ]);

@@ -1,13 +1,12 @@
+import {check} from '@augment-vir/assert';
 import {
-    PartialAndUndefined,
     addPrefix,
     copyThroughJson,
     mapObjectValues,
-    typedHasProperty,
+    type PartialWithUndefined,
 } from '@augment-vir/common';
-import {hasProperty, isRunTimeType} from 'run-time-assertions';
 import {ReadonlyObjectDeep} from 'type-fest/source/readonly-deep';
-import {joinUrlParts} from './join-url-parts';
+import {joinUrlPaths} from './join-url-paths.js';
 import {
     createFullPath,
     createHost,
@@ -15,19 +14,23 @@ import {
     createOrigin,
     createPaths,
     parseUrl,
-} from './parse-url';
+} from './parse-url.js';
 import {
     SearchParams,
     SearchParamsInput,
     combineSearchParams,
     searchParamsToObject,
     searchParamsToString,
-} from './search-params';
-import {UrlEncoding, UrlOptions} from './url-options';
-import {UrlParts} from './url-parts';
+} from './search-params.js';
+import {UrlEncoding, UrlOptions} from './url-options.js';
+import {UrlParts} from './url-parts.js';
 
-/** Overrides input for `buildUrl`. */
-export type UrlOverrides = PartialAndUndefined<{
+/**
+ * Overrides input for {@link buildUrl}.
+ *
+ * @category Internal
+ */
+export type UrlOverrides = PartialWithUndefined<{
     hash?: string;
     search?: string | SearchParamsInput;
     hostname?: string;
@@ -42,11 +45,21 @@ export type UrlOverrides = PartialAndUndefined<{
 /**
  * Build a URL straight from overrides.
  *
- * @category Primary Exports
- * @returns `UrlParts`, an object similar to the global `URL` class, but with some differences:
+ * @category Main
+ * @example
  *
- *   - `searchParams` is an object rather than an instance of `URLSearchParams`.
- *   - Search param values are not automatically encoded.
+ * ```ts
+ * import {buildUrl} from 'url-vir';
+ *
+ * buildUrl({
+ *     hostname: 'example.com',
+ *     search: {
+ *         hello: 'there',
+ *     },
+ * });
+ *
+ * buildUrl.href; // `'example.com/?hello=there'`
+ * ```
  */
 export function buildUrl(
     override: ReadonlyObjectDeep<UrlOverrides>,
@@ -55,11 +68,18 @@ export function buildUrl(
 /**
  * Build a URL by overriding an existing base URL string.
  *
- * @category Primary Exports
- * @returns `UrlParts`, an object similar to the global `URL` class, but with some differences:
+ * @category Main
+ * @example
  *
- *   - `searchParams` is an object rather than an instance of `URLSearchParams`.
- *   - Search param values are not automatically encoded.
+ * ```ts
+ * import {buildUrl} from 'url-vir';
+ *
+ * buildUrl('github.com/?hello=there', {
+ *     hostname: 'example.com',
+ * });
+ *
+ * buildUrl.href; // `'example.com/?hello=there'`
+ * ```
  */
 export function buildUrl(
     baseUrl: string | URL,
@@ -67,11 +87,9 @@ export function buildUrl(
     options?: ReadonlyObjectDeep<UrlOptions> | undefined,
 ): UrlParts;
 /**
- * @category Primary Exports
- * @returns `UrlParts`, an object similar to the global `URL` class, but with some differences:
+ * Builds a URL either from an object of URL parts or from overriding a base URL string.
  *
- *   - `searchParams` is an object rather than an instance of `URLSearchParams`.
- *   - Search param values are not automatically encoded.
+ * @category Main
  */
 export function buildUrl(
     baseUrlOrOverride: string | URL | ReadonlyObjectDeep<UrlOverrides>,
@@ -81,17 +99,17 @@ export function buildUrl(
         | undefined,
     maybeOptions?: ReadonlyObjectDeep<UrlOptions> | undefined,
 ): UrlParts {
-    const baseUrl: string = isRunTimeType(baseUrlOrOverride, 'string')
+    const baseUrl: string = check.isString(baseUrlOrOverride)
         ? baseUrlOrOverride
         : baseUrlOrOverride instanceof URL
           ? baseUrlOrOverride.toString()
           : '';
     const override: ReadonlyObjectDeep<UrlOverrides> =
-        isRunTimeType(baseUrlOrOverride, 'string') || baseUrlOrOverride instanceof URL
+        check.isString(baseUrlOrOverride) || baseUrlOrOverride instanceof URL
             ? (overrideOrOptions as Readonly<UrlOverrides>)
             : baseUrlOrOverride;
     const options: ReadonlyObjectDeep<UrlOptions> | undefined =
-        isRunTimeType(baseUrlOrOverride, 'string') || baseUrlOrOverride instanceof URL
+        check.isString(baseUrlOrOverride) || baseUrlOrOverride instanceof URL
             ? maybeOptions
             : (overrideOrOptions as Readonly<UrlOptions> | undefined);
 
@@ -100,15 +118,15 @@ export function buildUrl(
     const baseUrlParts = mapObjectValues(
         initUrlParts,
         (key, baseValue): string | SearchParamsInput | string[] => {
-            if (!typedHasProperty(override, key)) {
+            if (!check.hasKey(override, key)) {
                 return baseValue;
             }
 
             const overridePart = override[key];
 
-            if (isRunTimeType(overridePart, 'number')) {
+            if (check.isNumber(overridePart)) {
                 return String(overridePart);
-            } else if (isRunTimeType(overridePart, 'string')) {
+            } else if (check.isString(overridePart)) {
                 if (key === 'hash' && overridePart) {
                     return addPrefix({value: overridePart, prefix: '#'});
                 } else if (key === 'pathname') {
@@ -122,11 +140,11 @@ export function buildUrl(
         },
     ) as Record<keyof UrlParts, string | SearchParams | string[]> as UrlParts;
 
-    if (hasProperty(override, 'paths') && override.paths) {
-        baseUrlParts.pathname = joinUrlParts('', ...override.paths);
+    if (check.hasKey(override, 'paths') && override.paths) {
+        baseUrlParts.pathname = joinUrlPaths('', ...override.paths);
     }
 
-    const initSearchParams: SearchParams = isRunTimeType(override.search, 'string')
+    const initSearchParams: SearchParams = check.isString(override.search)
         ? searchParamsToObject(addPrefix({value: override.search, prefix: '?'}))
         : copyThroughJson((override.search || {}) as SearchParams);
 
