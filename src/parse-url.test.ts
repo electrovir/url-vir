@@ -1,5 +1,4 @@
-/* eslint-disable sonarjs/no-hardcoded-credentials */
-
+/* eslint-disable sonarjs/no-hardcoded-passwords */
 import {describe, itCases} from '@augment-vir/test';
 import {createHref, parseUrl} from './parse-url.js';
 import {emptyUrlParts} from './url-parts.js';

@@ -1,4 +1,4 @@
-/* eslint-disable sonarjs/no-hardcoded-credentials */
+/* eslint-disable sonarjs/no-hardcoded-passwords */
 
 import {UrlParts} from './url-parts.js';
 
