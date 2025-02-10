@@ -43,8 +43,8 @@ export const urlPartsShape = defineShape({
      */
     origin: '',
     /**
-     * Everything between origin and search/hash without a leading slash. If none exist, this will
-     * be simply `'/'`.
+     * Everything between origin and search/hash with a leading slash. If none exist, this will be
+     * simply `'/'`.
      */
     pathname: '/',
     /** Each path part of the pathname. */
