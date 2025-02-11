@@ -258,6 +258,69 @@ describe(buildUrl.name, () => {
                 href: 'https://user:pass@github.com:8765/path/1/2?hello=there&why#time-to-go',
             },
         },
+        {
+            it: 'works with IPv6',
+            inputs: [
+                'https://[::1]:3000',
+                {
+                    paths: [
+                        'hi',
+                        'bye',
+                    ],
+                },
+            ],
+            expect: {
+                fullPath: '/hi/bye',
+                hash: '',
+                password: '',
+                pathname: '/hi/bye',
+                paths: [
+                    'hi',
+                    'bye',
+                ],
+                port: '3000',
+                protocol: 'https',
+                search: '',
+                searchParams: {},
+                username: '',
+                hostname: '[::1]',
+                origin: 'https://[::1]:3000',
+                host: '[::1]:3000',
+                href: 'https://[::1]:3000/hi/bye',
+            },
+        },
+        {
+            it: 'works with IPv6 and password',
+            inputs: [
+                'https://user:pass@[::1]:3000',
+                {
+                    paths: [
+                        'hi',
+                        'bye',
+                    ],
+                },
+            ],
+            expect: {
+                fullPath: '/hi/bye',
+                hash: '',
+                // eslint-disable-next-line sonarjs/no-hardcoded-passwords
+                password: 'pass',
+                pathname: '/hi/bye',
+                paths: [
+                    'hi',
+                    'bye',
+                ],
+                port: '3000',
+                protocol: 'https',
+                search: '',
+                searchParams: {},
+                username: 'user',
+                hostname: '[::1]',
+                origin: 'https://[::1]:3000',
+                host: '[::1]:3000',
+                href: 'https://user:pass@[::1]:3000/hi/bye',
+            },
+        },
     ]);
 
     it('handles missing base string input', () => {

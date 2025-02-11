@@ -27,3 +27,24 @@ export const mockUrlParts: UrlParts = {
     },
     username: 'user',
 };
+
+const actual = {
+    fullPath: '/path/1/2?hello=there&why#time-to-go',
+    hash: '#time-to-go',
+    host: 'example.com8765',
+    hostname: 'example.com8765',
+    href: 'https://user:pass@example.com8765/path/1/2?hello=there&why#time-to-go',
+    origin: 'https://example.com8765',
+    password: 'pass',
+    pathname: '/path/1/2',
+    paths: [
+        'path',
+        '1',
+        '2',
+    ],
+    port: '',
+    protocol: 'https',
+    search: '?hello=there&why',
+    searchParams: {hello: ['there'], why: []},
+    username: 'user',
+};

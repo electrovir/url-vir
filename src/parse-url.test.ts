@@ -250,11 +250,11 @@ describe(parseUrl.name, () => {
             expect: {
                 ...mockUrlParts,
                 host: ':example.com:8765',
-                hostname: '',
+                hostname: ':example.com',
                 href: ':example.com:8765/path/1/2?hello=there&why#time-to-go',
                 origin: ':example.com:8765',
                 password: '',
-                port: 'example.com:8765',
+                port: '8765',
                 protocol: '',
                 username: '',
             },

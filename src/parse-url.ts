@@ -1,5 +1,5 @@
 import {check} from '@augment-vir/assert';
-import {addPrefix, removePrefix} from '@augment-vir/common';
+import {addPrefix, removePrefix, splitIncludeSplit} from '@augment-vir/common';
 import {searchParamsToObject} from './search-params.js';
 import {UrlOptions, codeValue} from './url-options.js';
 import {UrlParts} from './url-parts.js';
@@ -161,10 +161,14 @@ export function parseUrl(
     const username = rawUsernameParts.toReversed().join('').replace(/[/:]/g, '') || '';
     const password = rawPassword?.replace(/[/:]/g, '') || '';
 
-    const hostname = withoutLogin.replace(/[:/].*/, '');
-    const withoutHost = withoutLogin.replace(/^[^/:]*(:|\/|$)/, '$1');
+    const maybePort = splitIncludeSplit(withoutLogin.replace(/\/.*/, ''), ':', {
+        caseSensitive: true,
+    }).toReversed();
+    const port = maybePort[0]?.endsWith(']') ? '' : maybePort[1] === ':' ? maybePort[0] || '' : '';
+    const withoutPort = withoutLogin.replace(new RegExp(`:${port}($|/)`), '$1');
 
-    const port = removePrefix({value: withoutHost.replace(/\/.*/, ''), prefix: ':'});
+    const hostname = withoutPort.replace(/\/.*/, '');
+    const withoutHost = withoutLogin.replace(/^[^/]*(\/|$)/, '$1');
 
     const pathname = codeValue(withoutHost.replace(/^[^/]*(?:\/|$)/, '/'), options);
 
