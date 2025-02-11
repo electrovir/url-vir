@@ -309,15 +309,15 @@ describe(buildUrl.name, () => {
         {
             it: 'merges a relative path',
             inputs: [
-                'example.com/path/',
+                'example.com/path?something=hi',
                 './relative-path',
             ],
             expect: {
-                fullPath: '/path/relative-path',
+                fullPath: '/path/relative-path?something=hi',
                 hash: '',
                 host: 'example.com',
                 hostname: 'example.com',
-                href: 'example.com/path/relative-path',
+                href: 'example.com/path/relative-path?something=hi',
                 origin: 'example.com',
                 password: '',
                 pathname: '/path/relative-path',
@@ -327,8 +327,10 @@ describe(buildUrl.name, () => {
                 ],
                 port: '',
                 protocol: '',
-                search: '',
-                searchParams: {},
+                search: '?something=hi',
+                searchParams: {
+                    something: ['hi'],
+                },
                 username: '',
             },
         },

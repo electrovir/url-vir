@@ -184,7 +184,7 @@ export function buildUrl(
 
     if (check.hasKey(override, 'paths') && override.paths) {
         baseUrlParts.pathname = joinUrlPaths(
-            isRelative ? baseParts.fullPath : '',
+            isRelative ? baseParts.pathname : '',
             ...override.paths,
         );
     }
