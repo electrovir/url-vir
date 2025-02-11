@@ -142,6 +142,65 @@ describe(parseUrl.name, () => {
             },
         },
         {
+            it: 'parses an IPv6 url with a port',
+            inputs: [
+                'https://[::1]:3000/path',
+            ],
+            expect: {
+                ...emptyUrlParts,
+                fullPath: '/path',
+                paths: ['path'],
+                pathname: '/path',
+                host: '[::1]:3000',
+                hostname: '[::1]',
+                port: '3000',
+                href: 'https://[::1]:3000/path',
+                origin: 'https://[::1]:3000',
+                protocol: 'https',
+            },
+        },
+        {
+            it: 'parses an IPv6 url without a port',
+            inputs: [
+                'https://[::1]/path',
+            ],
+            expect: {
+                ...emptyUrlParts,
+                fullPath: '/path',
+                paths: ['path'],
+                pathname: '/path',
+                host: '[::1]',
+                hostname: '[::1]',
+                href: 'https://[::1]/path',
+                origin: 'https://[::1]',
+                protocol: 'https',
+            },
+        },
+        {
+            it: 'parses a relative path',
+            inputs: [
+                './relative-path',
+            ],
+            expect: {
+                fullPath: '/relative-path',
+                hash: '',
+                host: '',
+                hostname: '',
+                href: '/relative-path',
+                origin: '',
+                password: '',
+                pathname: '/relative-path',
+                paths: [
+                    'relative-path',
+                ],
+                port: '',
+                protocol: '',
+                search: '',
+                searchParams: {},
+                username: '',
+            },
+        },
+        {
             it: 'handles invalid protocol separator with auth',
             inputs: [
                 '//user:pass@example.com:8765/path/1/2?hello=there&why#time-to-go',

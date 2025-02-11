@@ -1,9 +1,16 @@
 import {assert} from '@augment-vir/assert';
 import {describe, it, itCases} from '@augment-vir/test';
-import {buildUrl} from './build-url.js';
+import {buildUrl, UrlOverrides} from './build-url.js';
+import {parseUrl} from './parse-url.js';
 import {SearchParamStrategy, UrlEncoding} from './url-options.js';
-import {emptyUrlParts} from './url-parts.js';
+import {emptyUrlParts, type UrlParts} from './url-parts.js';
 import {mockUrlParts, mockUrlString} from './url-parts.mock.js';
+
+describe('UrlOverrides', () => {
+    it('is assignable to from UrlParts', () => {
+        const testAssignment: Readonly<UrlOverrides> = {} as Readonly<UrlParts>;
+    });
+});
 
 describe(buildUrl.name, () => {
     itCases(buildUrl, [
@@ -256,6 +263,73 @@ describe(buildUrl.name, () => {
                 origin: 'https://github.com:8765',
                 host: 'github.com:8765',
                 href: 'https://user:pass@github.com:8765/path/1/2?hello=there&why#time-to-go',
+            },
+        },
+        {
+            it: 'can overwrite url parts',
+            inputs: [
+                parseUrl(mockUrlString),
+                {
+                    hostname: 'github.com',
+                },
+            ],
+            expect: {
+                ...mockUrlParts,
+                hostname: 'github.com',
+                origin: 'https://github.com:8765',
+                host: 'github.com:8765',
+                href: 'https://user:pass@github.com:8765/path/1/2?hello=there&why#time-to-go',
+            },
+        },
+        {
+            it: 'merges an absolute path',
+            inputs: [
+                'example.com/path/',
+                '/absolute-path',
+            ],
+            expect: {
+                fullPath: '/absolute-path',
+                hash: '',
+                host: 'example.com',
+                hostname: 'example.com',
+                href: 'example.com/absolute-path',
+                origin: 'example.com',
+                password: '',
+                pathname: '/absolute-path',
+                paths: [
+                    'absolute-path',
+                ],
+                port: '',
+                protocol: '',
+                search: '',
+                searchParams: {},
+                username: '',
+            },
+        },
+        {
+            it: 'merges a relative path',
+            inputs: [
+                'example.com/path/',
+                './relative-path',
+            ],
+            expect: {
+                fullPath: '/path/relative-path',
+                hash: '',
+                host: 'example.com',
+                hostname: 'example.com',
+                href: 'example.com/path/relative-path',
+                origin: 'example.com',
+                password: '',
+                pathname: '/path/relative-path',
+                paths: [
+                    'path',
+                    'relative-path',
+                ],
+                port: '',
+                protocol: '',
+                search: '',
+                searchParams: {},
+                username: '',
             },
         },
         {

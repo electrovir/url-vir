@@ -136,7 +136,9 @@ export function parseUrl(
     url: string | URL,
     options?: Readonly<Pick<UrlOptions, 'encoding'>> | undefined,
 ): UrlParts {
-    const urlString = check.isString(url) ? url : url.toString();
+    const urlString = check.isString(url)
+        ? removePrefix({value: url, prefix: '.'})
+        : url.toString();
 
     const rawHash = urlString.replace(/^[^#]*(?:#|$)/, '');
     const hash = rawHash ? addPrefix({value: codeValue(rawHash, options), prefix: '#'}) : '';

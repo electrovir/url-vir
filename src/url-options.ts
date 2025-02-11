@@ -1,4 +1,4 @@
-import {PartialWithUndefined} from '@augment-vir/common';
+import {defineShape, enumShape, optional, or} from 'object-shape-tester';
 import {Primitive} from 'type-fest';
 
 /**
@@ -41,22 +41,29 @@ export enum SearchParamStrategy {
 }
 
 /**
- * All options for parsing or building URLs.
+ * Shape definition for {@link UrlOptions}.
  *
- * @category Type
+ * @category Internal
  */
-export type UrlOptions = PartialWithUndefined<{
+export const urlOptionsShape = defineShape({
     /**
      * Whether to encode, decode, or pass url parts as they're given. Default behavior is to pass
      * url parts as they are given.
      */
-    encoding: UrlEncoding;
+    encoding: optional(or(undefined, enumShape(UrlEncoding))),
     /**
      * Determines how to handle conflicts between base search param values and new search param
      * values.
      */
-    searchParamStrategy: SearchParamStrategy;
-}>;
+    searchParamStrategy: optional(or(undefined, enumShape(SearchParamStrategy))),
+});
+
+/**
+ * All options for parsing or building URLs.
+ *
+ * @category Type
+ */
+export type UrlOptions = typeof urlOptionsShape.runtimeType;
 
 /**
  * Apply coding to multiple values. Removes `undefined` and `null` values and converts non-string

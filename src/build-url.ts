@@ -2,10 +2,11 @@ import {check} from '@augment-vir/assert';
 import {
     addPrefix,
     copyThroughJson,
+    filterObject,
     mapObjectValues,
     type PartialWithUndefined,
 } from '@augment-vir/common';
-import {ReadonlyObjectDeep} from 'type-fest/source/readonly-deep';
+import {defineShape, indexedKeys, isValidShape, optional, or} from 'object-shape-tester';
 import {joinUrlPaths} from './join-url-paths.js';
 import {
     createFullPath,
@@ -22,8 +23,35 @@ import {
     searchParamsToObject,
     searchParamsToString,
 } from './search-params.js';
-import {UrlEncoding, UrlOptions} from './url-options.js';
+import {UrlEncoding, UrlOptions, urlOptionsShape} from './url-options.js';
 import {UrlParts} from './url-parts.js';
+
+/**
+ * Shape definition for {@link UrlOverrides}.
+ *
+ * @category Internal
+ */
+export const urlOverridesShape = defineShape({
+    hash: optional(or(undefined, '')),
+    search: optional(
+        or(
+            undefined,
+            '',
+            indexedKeys({
+                keys: '',
+                required: false,
+                values: or(null, undefined, '', -1, false, 0n),
+            }),
+        ),
+    ),
+    hostname: optional(or(undefined, '')),
+    pathname: optional(or(undefined, '')),
+    paths: optional(or(undefined, [''])),
+    protocol: optional(or(undefined, '')),
+    username: optional(or(undefined, '')),
+    password: optional(or(undefined, '')),
+    port: optional(or(undefined, '', -1)),
+});
 
 /**
  * Overrides input for {@link buildUrl}.
@@ -62,7 +90,7 @@ export type UrlOverrides = PartialWithUndefined<{
  * ```
  */
 export function buildUrl(
-    override: ReadonlyObjectDeep<UrlOverrides>,
+    override: Readonly<UrlOverrides> | string | URL,
     options?: Readonly<UrlOptions> | undefined,
 ): UrlParts;
 /**
@@ -82,9 +110,9 @@ export function buildUrl(
  * ```
  */
 export function buildUrl(
-    baseUrl: string | URL,
-    override: ReadonlyObjectDeep<UrlOverrides>,
-    options?: ReadonlyObjectDeep<UrlOptions> | undefined,
+    baseUrl: Readonly<UrlParts> | string | URL,
+    override: Readonly<UrlOverrides> | string | URL,
+    options?: Readonly<UrlOptions> | undefined,
 ): UrlParts;
 /**
  * Builds a URL either from an object of URL parts or from overriding a base URL string.
@@ -92,33 +120,47 @@ export function buildUrl(
  * @category Main
  */
 export function buildUrl(
-    baseUrlOrOverride: string | URL | ReadonlyObjectDeep<UrlOverrides>,
-    overrideOrOptions?:
-        | ReadonlyObjectDeep<UrlOverrides>
-        | ReadonlyObjectDeep<UrlOptions>
-        | undefined,
-    maybeOptions?: ReadonlyObjectDeep<UrlOptions> | undefined,
+    baseUrlOrOverride: Readonly<UrlParts> | Readonly<UrlOverrides> | string | URL,
+    overrideOrOptions?: Readonly<UrlOverrides> | Readonly<UrlOptions> | string | URL | undefined,
+    maybeOptions?: Readonly<UrlOptions> | undefined,
 ): UrlParts {
-    const baseUrl: string = check.isString(baseUrlOrOverride)
-        ? baseUrlOrOverride
-        : baseUrlOrOverride instanceof URL
-          ? baseUrlOrOverride.toString()
-          : '';
-    const override: ReadonlyObjectDeep<UrlOverrides> =
-        check.isString(baseUrlOrOverride) || baseUrlOrOverride instanceof URL
-            ? (overrideOrOptions as Readonly<UrlOverrides>)
-            : baseUrlOrOverride;
-    const options: ReadonlyObjectDeep<UrlOptions> | undefined =
-        check.isString(baseUrlOrOverride) || baseUrlOrOverride instanceof URL
-            ? maybeOptions
-            : (overrideOrOptions as Readonly<UrlOptions> | undefined);
+    const hasThirdOptions = !!maybeOptions;
+    /**
+     * If this is `true`, then that means that the first input `baseUrlOrOverride` is `override` and
+     * there is only one required input
+     */
+    const secondArgIsOptions =
+        overrideOrOptions == undefined || isValidShape(overrideOrOptions, urlOptionsShape);
 
-    const initUrlParts = parseUrl(baseUrl);
+    const baseParts: Readonly<UrlParts> = secondArgIsOptions
+        ? parseUrl('')
+        : check.instanceOf(baseUrlOrOverride, URL) || check.isString(baseUrlOrOverride)
+          ? parseUrl(baseUrlOrOverride)
+          : (baseUrlOrOverride as UrlParts);
+    const rawOverride = secondArgIsOptions
+        ? baseUrlOrOverride
+        : (overrideOrOptions as Exclude<typeof overrideOrOptions, UrlOptions>);
+
+    const isRelative = check.isString(rawOverride) && rawOverride.startsWith('.');
+
+    const override: UrlOverrides =
+        check.isString(rawOverride) || check.instanceOf(rawOverride, URL)
+            ? filterObject(parseUrl(rawOverride), (key, value) => check.isTruthy(value))
+            : rawOverride;
+
+    const options: Readonly<UrlOptions> | undefined = hasThirdOptions
+        ? maybeOptions
+        : secondArgIsOptions
+          ? overrideOrOptions
+          : undefined;
 
     const baseUrlParts = mapObjectValues(
-        initUrlParts,
+        baseParts,
         (key, baseValue): string | SearchParamsInput | string[] => {
-            if (!check.hasKey(override, key)) {
+            if (
+                /** Ignore any properties that haven't been overridden. */
+                !check.hasKey(override, key)
+            ) {
                 return baseValue;
             }
 
@@ -141,7 +183,10 @@ export function buildUrl(
     ) as Record<keyof UrlParts, string | SearchParams | string[]> as UrlParts;
 
     if (check.hasKey(override, 'paths') && override.paths) {
-        baseUrlParts.pathname = joinUrlPaths('', ...override.paths);
+        baseUrlParts.pathname = joinUrlPaths(
+            isRelative ? baseParts.fullPath : '',
+            ...override.paths,
+        );
     }
 
     const initSearchParams: SearchParams = check.isString(override.search)
