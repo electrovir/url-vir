@@ -21,7 +21,8 @@ export const urlPartsShape = defineShape(
         /**
          * Infrequently used password part of a url.
          *
-         * @example BuildUrl('https://anonymous:my-pass@developer.mozilla.org').password === 'my-pass';
+         * @example BuildUrl('https://anonymous:my-pass@developer.mozilla.org').password ===
+         * 'my-pass';
          */
         password: '',
         /**
@@ -44,20 +45,20 @@ export const urlPartsShape = defineShape(
          */
         origin: '',
         /**
-         * Everything between origin and search/hash with a leading slash. If none exist, this will be
-         * simply `'/'`.
+         * Everything between origin and search/hash with a leading slash. If none exist, this will
+         * be simply `'/'`.
          */
         pathname: '/',
         /** Each path part of the pathname. */
         paths: [''],
         /**
-         * Everything after a ?, excluding the hash, as a string. If none exist, this will be an empty
-         * string.
+         * Everything after a ?, excluding the hash, as a string. If none exist, this will be an
+         * empty string.
          */
         search: '',
         /**
-         * An object representation of the parameters contained within the search string. If none exist,
-         * it will be an empty object.
+         * An object representation of the parameters contained within the search string. If none
+         * exist, it will be an empty object.
          */
         searchParams: searchParamsShape,
         /** Everything after the hash (#). If none exist, this will be an empty string. */
