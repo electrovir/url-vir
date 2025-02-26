@@ -5,6 +5,7 @@ import {
     filterObject,
     mapObjectValues,
     type PartialWithUndefined,
+    type Writable,
 } from '@augment-vir/common';
 import {defineShape, indexedKeys, isValidShape, optional, or} from 'object-shape-tester';
 import {joinUrlPaths} from './join-url-paths.js';
@@ -60,10 +61,10 @@ export const urlOverridesShape = defineShape({
  */
 export type UrlOverrides = PartialWithUndefined<{
     hash?: string;
-    search?: string | SearchParamsInput;
+    search?: string | Readonly<SearchParamsInput>;
     hostname?: string;
     pathname?: string;
-    paths?: string[];
+    paths?: ReadonlyArray<string>;
     protocol?: string;
     username?: string;
     password?: string;
@@ -156,7 +157,7 @@ export function buildUrl(
 
     const baseUrlParts = mapObjectValues(
         baseParts,
-        (key, baseValue): string | SearchParamsInput | string[] => {
+        (key, baseValue): string | Readonly<SearchParamsInput> | ReadonlyArray<string> => {
             if (
                 /** Ignore any properties that haven't been overridden. */
                 !check.hasKey(override, key)
@@ -180,7 +181,7 @@ export function buildUrl(
                 return baseValue;
             }
         },
-    ) as Record<keyof UrlParts, string | SearchParams | string[]> as UrlParts;
+    ) as Record<keyof UrlParts, string | SearchParams | string[]> as Writable<UrlParts>;
 
     if (check.hasKey(override, 'paths') && override.paths) {
         baseUrlParts.pathname = joinUrlPaths(
