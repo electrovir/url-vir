@@ -1,8 +1,8 @@
 import {check} from '@augment-vir/assert';
 import {addPrefix, removePrefix, splitIncludeSplit} from '@augment-vir/common';
 import {searchParamsToObject} from './search-params.js';
-import {UrlOptions, codeValue} from './url-options.js';
-import {UrlParts} from './url-parts.js';
+import {type UrlOptions, codeValue} from './url-options.js';
+import {type UrlParts} from './url-parts.js';
 
 /**
  * Combined the needed URL parts into a URL's full href.

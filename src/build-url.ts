@@ -18,14 +18,14 @@ import {
     parseUrl,
 } from './parse-url.js';
 import {
-    SearchParams,
-    SearchParamsInput,
     combineSearchParams,
+    type SearchParams,
+    type SearchParamsInput,
     searchParamsToObject,
     searchParamsToString,
 } from './search-params.js';
-import {UrlEncoding, UrlOptions, urlOptionsShape} from './url-options.js';
-import {UrlParts} from './url-parts.js';
+import {UrlEncoding, type UrlOptions, urlOptionsShape} from './url-options.js';
+import {type UrlParts} from './url-parts.js';
 
 /**
  * Shape definition for {@link UrlOverrides}.

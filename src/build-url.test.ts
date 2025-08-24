@@ -1,6 +1,6 @@
 import {assert} from '@augment-vir/assert';
 import {describe, it, itCases} from '@augment-vir/test';
-import {buildUrl, UrlOverrides} from './build-url.js';
+import {buildUrl, type UrlOverrides} from './build-url.js';
 import {parseUrl} from './parse-url.js';
 import {SearchParamStrategy, UrlEncoding} from './url-options.js';
 import {emptyUrlParts, type UrlParts} from './url-parts.js';

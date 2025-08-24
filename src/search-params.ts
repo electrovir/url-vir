@@ -1,6 +1,7 @@
 import {check} from '@augment-vir/assert';
 import {
     addPrefix,
+    ensureArray,
     filterMap,
     filterObject,
     getOrSet,
@@ -8,9 +9,9 @@ import {
     safeSplit,
 } from '@augment-vir/common';
 import {defineShape, indexedKeys} from 'object-shape-tester';
-import {Primitive} from 'type-fest';
-import {ReadonlyObjectDeep} from 'type-fest/source/readonly-deep';
-import {SearchParamStrategy, UrlOptions, codeValue, codeValues} from './url-options.js';
+import {type Primitive} from 'type-fest';
+import {type ReadonlyObjectDeep} from 'type-fest/source/readonly-deep';
+import {SearchParamStrategy, type UrlOptions, codeValue, codeValues} from './url-options.js';
 
 /**
  * Shape definition for `SearchParams`.
@@ -51,16 +52,14 @@ export function combineSearchParams(
     newParams: Readonly<SearchParamsInput>,
     options?: Readonly<Pick<UrlOptions, 'searchParamStrategy' | 'encoding'>> | undefined,
 ): SearchParams {
-    const actualBaseParams =
-        options?.searchParamStrategy === SearchParamStrategy.Clear
-            ? {}
-            : mapObjectValues(baseParams, (key, value) => {
-                  if (check.isString(value)) {
-                      return [value];
-                  } else {
-                      return value;
-                  }
-              });
+    const actualBaseParams: Record<
+        string,
+        ReadonlyArray<Primitive>
+    > = options?.searchParamStrategy === SearchParamStrategy.Clear
+        ? {}
+        : mapObjectValues(baseParams, (key, value) => {
+              return ensureArray(value);
+          });
 
     const searchParams = mapObjectValues(
         newParams,

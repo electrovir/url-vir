@@ -1,5 +1,5 @@
 import {defineShape, enumShape, optional, or} from 'object-shape-tester';
-import {Primitive} from 'type-fest';
+import {type Primitive} from 'type-fest';
 
 /**
  * Determines whether url parsing should using encoding, decoding, or neither.
@@ -19,8 +19,8 @@ export enum UrlEncoding {
 }
 
 /**
- * Determines how to replace clashing search param keys. If {@link SearchParamStrategy.Clear} is
- * used, it also wipes all base search params.
+ * Determines how to replace clashing search param keys. If `SearchParamStrategy.Clear` is used, it
+ * also wipes all base search params.
  *
  * @category Type
  */

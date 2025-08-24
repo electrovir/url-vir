@@ -1,6 +1,6 @@
 import {check} from '@augment-vir/assert';
 import {wrapInTry} from '@augment-vir/common';
-import {UrlParts} from './url-parts.js';
+import {type UrlParts} from './url-parts.js';
 
 /**
  * Checks if the given URL can be parsed by the `URL` class. Note that this is pretty strict: many
