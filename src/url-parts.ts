@@ -52,8 +52,8 @@ export const urlPartsShape = defineShape(
         /** Each path part of the pathname. */
         paths: [''],
         /**
-         * Everything after a ?, excluding the hash, as a string. If none exist, this will be an
-         * empty string.
+         * Everything after a ?, excluding the hash, including `?`, as a string. If none exist, this
+         * will be an empty string.
          */
         search: '',
         /**
@@ -61,7 +61,12 @@ export const urlPartsShape = defineShape(
          * exist, it will be an empty object.
          */
         searchParams: searchParamsShape,
-        /** Everything after the hash (#). If none exist, this will be an empty string. */
+        /**
+         * Everything after the hash (#), including the hash itself. If none exist, this will be an
+         * empty string.
+         *
+         * @example '#/my/hash/route'
+         */
         hash: '',
         /**
          * Includes:
