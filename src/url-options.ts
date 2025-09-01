@@ -1,4 +1,4 @@
-import {defineShape, enumShape, optional, or} from 'object-shape-tester';
+import {defineShape, enumShape, optionalShape, unionShape} from 'object-shape-tester';
 import {type Primitive} from 'type-fest';
 
 /**
@@ -50,12 +50,12 @@ export const urlOptionsShape = defineShape({
      * Whether to encode, decode, or pass url parts as they're given. Default behavior is to pass
      * url parts as they are given.
      */
-    encoding: optional(or(undefined, enumShape(UrlEncoding))),
+    encoding: optionalShape(unionShape(undefined, enumShape(UrlEncoding))),
     /**
      * Determines how to handle conflicts between base search param values and new search param
      * values.
      */
-    searchParamStrategy: optional(or(undefined, enumShape(SearchParamStrategy))),
+    searchParamStrategy: optionalShape(unionShape(undefined, enumShape(SearchParamStrategy))),
 });
 
 /**

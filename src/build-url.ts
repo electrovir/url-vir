@@ -4,10 +4,15 @@ import {
     copyThroughJson,
     filterObject,
     mapObjectValues,
-    type PartialWithUndefined,
     type Writable,
 } from '@augment-vir/common';
-import {defineShape, indexedKeys, isValidShape, optional, or} from 'object-shape-tester';
+import {
+    checkValidShape,
+    defineShape,
+    optionalShape,
+    recordShape,
+    unionShape,
+} from 'object-shape-tester';
 import {joinUrlPaths} from './join-url-paths.js';
 import {
     createFullPath,
@@ -33,25 +38,31 @@ import {type UrlParts} from './url-parts.js';
  * @category Internal
  */
 export const urlOverridesShape = defineShape({
-    hash: optional(or(undefined, '')),
-    search: optional(
-        or(
+    hash: optionalShape(unionShape(undefined, '')),
+    search: optionalShape(
+        unionShape(
             undefined,
             '',
-            indexedKeys({
+            recordShape({
                 keys: '',
-                required: false,
-                values: or(null, undefined, '', -1, false, 0n),
+                values: unionShape(null, undefined, '', -1, false, 0n, [
+                    null,
+                    undefined,
+                    '',
+                    -1,
+                    false,
+                    0n,
+                ]),
             }),
         ),
     ),
-    hostname: optional(or(undefined, '')),
-    pathname: optional(or(undefined, '')),
-    paths: optional(or(undefined, [''])),
-    protocol: optional(or(undefined, '')),
-    username: optional(or(undefined, '')),
-    password: optional(or(undefined, '')),
-    port: optional(or(undefined, '', -1)),
+    hostname: optionalShape(unionShape(undefined, '')),
+    pathname: optionalShape(unionShape(undefined, '')),
+    paths: optionalShape(unionShape(undefined, [''])),
+    protocol: optionalShape(unionShape(undefined, '')),
+    username: optionalShape(unionShape(undefined, '')),
+    password: optionalShape(unionShape(undefined, '')),
+    port: optionalShape(unionShape(undefined, '', -1)),
 });
 
 /**
@@ -59,17 +70,7 @@ export const urlOverridesShape = defineShape({
  *
  * @category Internal
  */
-export type UrlOverrides = PartialWithUndefined<{
-    hash?: string;
-    search?: string | Readonly<SearchParamsInput>;
-    hostname?: string;
-    pathname?: string;
-    paths?: ReadonlyArray<string>;
-    protocol?: string;
-    username?: string;
-    password?: string;
-    port?: string | number;
-}>;
+export type UrlOverrides = typeof urlOverridesShape.runtimeType;
 
 /**
  * Build a URL straight from overrides.
@@ -131,7 +132,10 @@ export function buildUrl(
      * there is only one required input
      */
     const secondArgIsOptions =
-        overrideOrOptions == undefined || isValidShape(overrideOrOptions, urlOptionsShape);
+        overrideOrOptions == undefined ||
+        checkValidShape(overrideOrOptions, urlOptionsShape, {
+            allowExtraKeys: false,
+        });
 
     const baseParts: Readonly<UrlParts> = secondArgIsOptions
         ? parseUrl('')

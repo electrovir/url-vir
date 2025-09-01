@@ -6,12 +6,13 @@ import {
     filterObject,
     getOrSet,
     mapObjectValues,
+    type MaybeArray,
     safeSplit,
 } from '@augment-vir/common';
-import {defineShape, indexedKeys} from 'object-shape-tester';
+import {defineShape, recordShape} from 'object-shape-tester';
 import {type Primitive} from 'type-fest';
 import {type ReadonlyObjectDeep} from 'type-fest/source/readonly-deep';
-import {SearchParamStrategy, type UrlOptions, codeValue, codeValues} from './url-options.js';
+import {codeValue, codeValues, SearchParamStrategy, type UrlOptions} from './url-options.js';
 
 /**
  * Shape definition for `SearchParams`.
@@ -19,10 +20,9 @@ import {SearchParamStrategy, type UrlOptions, codeValue, codeValues} from './url
  * @category Util
  */
 export const searchParamsShape = defineShape(
-    indexedKeys({
+    recordShape({
         keys: '',
         values: [''],
-        required: true,
     }),
 );
 
@@ -39,7 +39,7 @@ export type SearchParams = typeof searchParamsShape.runtimeType;
  *
  * @category Internal
  */
-export type SearchParamsInput = Record<string, Primitive | ReadonlyArray<Primitive>>;
+export type SearchParamsInput = Record<string, MaybeArray<Exclude<Primitive, symbol>>>;
 
 /**
  * Combine two objects of search params. Configure the combination strategy using the third
