@@ -4,6 +4,7 @@ import {
     copyThroughJson,
     filterObject,
     mapObjectValues,
+    type ReadonlyDeep,
     type Writable,
 } from '@augment-vir/common';
 import {
@@ -92,8 +93,8 @@ export type UrlOverrides = typeof urlOverridesShape.runtimeType;
  * ```
  */
 export function buildUrl(
-    override: Readonly<UrlOverrides> | string | URL,
-    options?: Readonly<UrlOptions> | undefined,
+    override: ReadonlyDeep<UrlOverrides> | string | URL,
+    options?: ReadonlyDeep<UrlOptions> | undefined,
 ): UrlParts;
 /**
  * Build a URL by overriding an existing base URL string.
@@ -112,9 +113,9 @@ export function buildUrl(
  * ```
  */
 export function buildUrl(
-    baseUrl: Readonly<UrlParts> | string | URL,
-    override: Readonly<UrlOverrides> | string | URL,
-    options?: Readonly<UrlOptions> | undefined,
+    baseUrl: ReadonlyDeep<UrlParts> | string | URL,
+    override: ReadonlyDeep<UrlOverrides> | string | URL,
+    options?: ReadonlyDeep<UrlOptions> | undefined,
 ): UrlParts;
 /**
  * Builds a URL either from an object of URL parts or from overriding a base URL string.
@@ -122,9 +123,14 @@ export function buildUrl(
  * @category Main
  */
 export function buildUrl(
-    baseUrlOrOverride: Readonly<UrlParts> | Readonly<UrlOverrides> | string | URL,
-    overrideOrOptions?: Readonly<UrlOverrides> | Readonly<UrlOptions> | string | URL | undefined,
-    maybeOptions?: Readonly<UrlOptions> | undefined,
+    baseUrlOrOverride: ReadonlyDeep<UrlParts> | ReadonlyDeep<UrlOverrides> | string | URL,
+    overrideOrOptions?:
+        | ReadonlyDeep<UrlOverrides>
+        | ReadonlyDeep<UrlOptions>
+        | string
+        | URL
+        | undefined,
+    maybeOptions?: ReadonlyDeep<UrlOptions> | undefined,
 ): UrlParts {
     const hasThirdOptions = !!maybeOptions;
     /**
@@ -148,7 +154,7 @@ export function buildUrl(
 
     const isRelative = check.isString(rawOverride) && rawOverride.startsWith('.');
 
-    const override: UrlOverrides =
+    const override: ReadonlyDeep<UrlOverrides> =
         check.isString(rawOverride) || check.instanceOf(rawOverride, URL)
             ? filterObject(parseUrl(rawOverride), (key, value) => check.isTruthy(value))
             : rawOverride;
