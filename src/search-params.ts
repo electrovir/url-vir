@@ -10,8 +10,7 @@ import {
     safeSplit,
 } from '@augment-vir/common';
 import {defineShape, recordShape} from 'object-shape-tester';
-import {type Primitive} from 'type-fest';
-import {type ReadonlyObjectDeep} from 'type-fest/source/readonly-deep';
+import {type Primitive, type ReadonlyDeep} from 'type-fest';
 import {codeValue, codeValues, SearchParamStrategy, type UrlOptions} from './url-options.js';
 
 /**
@@ -119,7 +118,7 @@ export function combineSearchParams(
  */
 export function searchParamsToObject(
     input: string | Readonly<Pick<URL, 'search'>> | URLSearchParams,
-    options?: ReadonlyObjectDeep<UrlOptions> | undefined,
+    options?: ReadonlyDeep<UrlOptions> | undefined,
 ): SearchParams {
     if (check.isString(input) && !input.includes('?')) {
         return {};
@@ -205,7 +204,7 @@ function wrapParamValue(
  */
 export function searchParamsToString(
     input: Readonly<SearchParamsInput>,
-    options?: ReadonlyObjectDeep<UrlOptions> | undefined,
+    options?: ReadonlyDeep<UrlOptions> | undefined,
 ): string {
     /**
      * This does not use the global `URLSearchParams` class because that automatically encodes
