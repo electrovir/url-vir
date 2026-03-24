@@ -26,8 +26,8 @@ export function createHref({
 >): string {
     return [
         protocol ? protocol + '://' : '',
-        username ? username + ':' : '',
-        password ? password + '@' : '',
+        username ? encodeURIComponent(username) + ':' : '',
+        password ? encodeURIComponent(password) + '@' : '',
         createHost({hostname, port}),
         createFullPath({hash, pathname, search}),
     ].join('');
@@ -160,8 +160,8 @@ export function parseUrl(
         rawPassword,
         ...rawUsernameParts
     ] = hasLogin ? login.split(':').reverse() : [];
-    const username = rawUsernameParts.toReversed().join('').replace(/[/:]/g, '') || '';
-    const password = rawPassword?.replace(/[/:]/g, '') || '';
+    const username = decodeURIComponent(rawUsernameParts.toReversed().join('').replace(/[/:]/g, '') || '');
+    const password = decodeURIComponent(rawPassword?.replace(/[/:]/g, '') || '');
 
     const maybePort = splitIncludeSplit(withoutLogin.replace(/\/.*/, ''), ':', {
         caseSensitive: true,

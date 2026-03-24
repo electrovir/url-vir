@@ -399,6 +399,63 @@ describe(buildUrl.name, () => {
         },
     ]);
 
+    itCases(
+        ({username, password}: {username: string; password: string}) => {
+            const result = buildUrl({
+                protocol: 'postgresql',
+                hostname: 'db.example.com',
+                port: 5432,
+                paths: ['mydb'],
+                username,
+                password,
+            });
+
+            return {
+                username: result.username,
+                password: result.password,
+                href: result.href,
+            };
+        },
+        [
+            {
+                it: 'encodes # in password',
+                input: {
+                    username: 'dbuser',
+                    password: 'abc#xyz',
+                },
+                expect: {
+                    username: 'dbuser',
+                    password: 'abc#xyz',
+                    href: 'postgresql://dbuser:abc%23xyz@db.example.com:5432/mydb',
+                },
+            },
+            {
+                it: 'encodes ? in password',
+                input: {
+                    username: 'dbuser',
+                    password: 'pass?word',
+                },
+                expect: {
+                    username: 'dbuser',
+                    password: 'pass?word',
+                    href: 'postgresql://dbuser:pass%3Fword@db.example.com:5432/mydb',
+                },
+            },
+            {
+                it: 'encodes @ in username',
+                input: {
+                    username: 'user@domain',
+                    password: 'pass',
+                },
+                expect: {
+                    username: 'user@domain',
+                    password: 'pass',
+                    href: 'postgresql://user%40domain:pass@db.example.com:5432/mydb',
+                },
+            },
+        ],
+    );
+
     it('handles missing base string input', () => {
         assert.deepEquals(
             buildUrl({
