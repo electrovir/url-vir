@@ -319,6 +319,44 @@ describe(parseUrl.name, () => {
             },
         },
         {
+            it: 'decodes percent-encoded password',
+            inputs: [
+                'https://user:abc%23xyz@example.com/path',
+            ],
+            expect: {
+                ...emptyUrlParts,
+                fullPath: '/path',
+                host: 'example.com',
+                hostname: 'example.com',
+                href: 'https://user:abc%23xyz@example.com/path',
+                origin: 'https://example.com',
+                password: 'abc#xyz',
+                pathname: '/path',
+                paths: ['path'],
+                protocol: 'https',
+                username: 'user',
+            },
+        },
+        {
+            it: 'decodes percent-encoded username',
+            inputs: [
+                'https://user%40domain:pass@example.com/path',
+            ],
+            expect: {
+                ...emptyUrlParts,
+                fullPath: '/path',
+                host: 'example.com',
+                hostname: 'example.com',
+                href: 'https://user%40domain:pass@example.com/path',
+                origin: 'https://example.com',
+                password: 'pass',
+                pathname: '/path',
+                paths: ['path'],
+                protocol: 'https',
+                username: 'user@domain',
+            },
+        },
+        {
             it: 'handles a simple url',
             inputs: [
                 'https://example.com',
@@ -473,6 +511,34 @@ describe(createHref.name, () => {
                 username: '',
             },
             expect: '/path/1/2?hello=there',
+        },
+        {
+            it: 'encodes special characters in password',
+            input: {
+                hash: '',
+                hostname: 'example.com',
+                port: '',
+                password: 'abc#xyz',
+                pathname: '/',
+                protocol: 'https',
+                search: '',
+                username: 'user',
+            },
+            expect: 'https://user:abc%23xyz@example.com/',
+        },
+        {
+            it: 'encodes special characters in username',
+            input: {
+                hash: '',
+                hostname: 'example.com',
+                port: '',
+                password: 'pass',
+                pathname: '/',
+                protocol: 'https',
+                search: '',
+                username: 'user@domain',
+            },
+            expect: 'https://user%40domain:pass@example.com/',
         },
     ]);
 });
