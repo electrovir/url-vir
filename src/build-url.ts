@@ -181,9 +181,15 @@ export function buildUrl(
                 return String(overridePart);
             } else if (check.isString(overridePart)) {
                 if (key === 'hash' && overridePart) {
-                    return addPrefix({value: overridePart, prefix: '#'});
+                    return addPrefix({
+                        value: overridePart,
+                        prefix: '#',
+                    });
                 } else if (key === 'pathname') {
-                    return addPrefix({value: overridePart, prefix: '/'});
+                    return addPrefix({
+                        value: overridePart,
+                        prefix: '/',
+                    });
                 } else {
                     return overridePart;
                 }
@@ -201,7 +207,12 @@ export function buildUrl(
     }
 
     const initSearchParams: SearchParams = check.isString(override.search)
-        ? searchParamsToObject(addPrefix({value: override.search, prefix: '?'}))
+        ? searchParamsToObject(
+              addPrefix({
+                  value: override.search,
+                  prefix: '?',
+              }),
+          )
         : copyThroughJson((override.search || {}) as SearchParams);
 
     const searchParams = combineSearchParams(baseUrlParts.searchParams, initSearchParams, {

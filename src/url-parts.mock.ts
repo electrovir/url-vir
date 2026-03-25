@@ -1,5 +1,3 @@
-/* eslint-disable sonarjs/no-hardcoded-passwords */
-
 import {type UrlParts} from './url-parts.js';
 
 export const mockUrlString =

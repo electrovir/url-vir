@@ -28,8 +28,15 @@ export function createHref({
         protocol ? protocol + '://' : '',
         username ? encodeURIComponent(username) + ':' : '',
         password ? encodeURIComponent(password) + '@' : '',
-        createHost({hostname, port}),
-        createFullPath({hash, pathname, search}),
+        createHost({
+            hostname,
+            port,
+        }),
+        createFullPath({
+            hash,
+            pathname,
+            search,
+        }),
     ].join('');
 }
 
@@ -39,7 +46,10 @@ export function createHref({
  * @category Internal
  */
 export function createPaths({pathname}: Readonly<Pick<UrlParts, 'pathname'>>) {
-    const relativePath = removePrefix({value: pathname, prefix: '/'});
+    const relativePath = removePrefix({
+        value: pathname,
+        prefix: '/',
+    });
     return relativePath ? relativePath.split('/') : [];
 }
 
@@ -54,9 +64,22 @@ export function createFullPath({
     search,
 }: Readonly<Pick<UrlParts, 'hash' | 'pathname' | 'search'>>) {
     return [
-        addPrefix({value: pathname, prefix: '/'}),
-        search ? addPrefix({value: search, prefix: '?'}) : '',
-        hash ? addPrefix({value: hash, prefix: '#'}) : '',
+        addPrefix({
+            value: pathname,
+            prefix: '/',
+        }),
+        search
+            ? addPrefix({
+                  value: search,
+                  prefix: '?',
+              })
+            : '',
+        hash
+            ? addPrefix({
+                  value: hash,
+                  prefix: '#',
+              })
+            : '',
     ].join('');
 }
 
@@ -137,15 +160,28 @@ export function parseUrl(
     options?: Readonly<Pick<UrlOptions, 'encoding'>> | undefined,
 ): UrlParts {
     const urlString = check.isString(url)
-        ? removePrefix({value: url, prefix: '.'})
+        ? removePrefix({
+              value: url,
+              prefix: '.',
+          })
         : url.toString();
 
     const rawHash = urlString.replace(/^[^#]*(?:#|$)/, '');
-    const hash = rawHash ? addPrefix({value: codeValue(rawHash, options), prefix: '#'}) : '';
+    const hash = rawHash
+        ? addPrefix({
+              value: codeValue(rawHash, options),
+              prefix: '#',
+          })
+        : '';
     const withoutHash = urlString.replace(/#[^#]*$/, '');
 
     const rawSearch = withoutHash.replace(/^[^?]*(?:\?|$)/, '');
-    const search = rawSearch ? addPrefix({value: codeValue(rawSearch, options), prefix: '?'}) : '';
+    const search = rawSearch
+        ? addPrefix({
+              value: codeValue(rawSearch, options),
+              prefix: '?',
+          })
+        : '';
     const withoutSearch = withoutHash.replace(/\?[^?]*$/, '');
 
     const protocol = withoutSearch.includes('://') ? withoutSearch.replace(/:\/\/.*$/, '') : '';
@@ -160,7 +196,9 @@ export function parseUrl(
         rawPassword,
         ...rawUsernameParts
     ] = hasLogin ? login.split(':').reverse() : [];
-    const username = decodeURIComponent(rawUsernameParts.toReversed().join('').replace(/[/:]/g, '') || '');
+    const username = decodeURIComponent(
+        rawUsernameParts.toReversed().join('').replace(/[/:]/g, '') || '',
+    );
     const password = decodeURIComponent(rawPassword?.replace(/[/:]/g, '') || '');
 
     const maybePort = splitIncludeSplit(withoutLogin.replace(/\/.*/, ''), ':', {
@@ -174,9 +212,16 @@ export function parseUrl(
 
     const pathname = codeValue(withoutHost.replace(/^[^/]*(?:\/|$)/, '/'), options);
 
-    const host = createHost({hostname, port});
+    const host = createHost({
+        hostname,
+        port,
+    });
 
-    const origin = createOrigin({hostname, port, protocol});
+    const origin = createOrigin({
+        hostname,
+        port,
+        protocol,
+    });
 
     const href = createHref({
         hash,
@@ -190,10 +235,16 @@ export function parseUrl(
     });
 
     const searchParams = searchParamsToObject(search);
-    const paths = createPaths({pathname});
+    const paths = createPaths({
+        pathname,
+    });
 
     return {
-        fullPath: createFullPath({hash, pathname, search}),
+        fullPath: createFullPath({
+            hash,
+            pathname,
+            search,
+        }),
         hash,
         host,
         hostname,

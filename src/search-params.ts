@@ -156,7 +156,11 @@ export function searchParamsToObject(
                 value,
             ],
         ) => {
-            const coded = codeParamKeyValue({options, key, value});
+            const coded = codeParamKeyValue({
+                options,
+                key,
+                value,
+            });
 
             const existingKeyValue = getOrSet(accum, coded.key, () => []);
 
@@ -220,7 +224,11 @@ export function searchParamsToString(
 
             if (values?.length) {
                 return values.map((value) => {
-                    const coded = codeParamKeyValue({options, key, value});
+                    const coded = codeParamKeyValue({
+                        options,
+                        key,
+                        value,
+                    });
 
                     return [
                         coded.key,
@@ -244,7 +252,10 @@ export function searchParamsToString(
         return '';
     }
 
-    return addPrefix({value: mappedValues.join('&'), prefix: '?'});
+    return addPrefix({
+        value: mappedValues.join('&'),
+        prefix: '?',
+    });
 }
 
 function codeParamKeyValue({

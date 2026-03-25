@@ -379,7 +379,6 @@ describe(buildUrl.name, () => {
             expect: {
                 fullPath: '/hi/bye',
                 hash: '',
-                // eslint-disable-next-line sonarjs/no-hardcoded-passwords
                 password: 'pass',
                 pathname: '/hi/bye',
                 paths: [
@@ -405,7 +404,7 @@ describe(buildUrl.name, () => {
                 protocol: 'postgresql',
                 hostname: 'db.example.com',
                 port: 5432,
-                paths: ['mydb'],
+                paths: ['my-db'],
                 username,
                 password,
             });
@@ -420,25 +419,25 @@ describe(buildUrl.name, () => {
             {
                 it: 'encodes # in password',
                 input: {
-                    username: 'dbuser',
+                    username: 'db-user',
                     password: 'abc#xyz',
                 },
                 expect: {
-                    username: 'dbuser',
+                    username: 'db-user',
                     password: 'abc#xyz',
-                    href: 'postgresql://dbuser:abc%23xyz@db.example.com:5432/mydb',
+                    href: 'postgresql://db-user:abc%23xyz@db.example.com:5432/my-db',
                 },
             },
             {
                 it: 'encodes ? in password',
                 input: {
-                    username: 'dbuser',
+                    username: 'db-user',
                     password: 'pass?word',
                 },
                 expect: {
-                    username: 'dbuser',
+                    username: 'db-user',
                     password: 'pass?word',
-                    href: 'postgresql://dbuser:pass%3Fword@db.example.com:5432/mydb',
+                    href: 'postgresql://db-user:pass%3Fword@db.example.com:5432/my-db',
                 },
             },
             {
@@ -450,7 +449,7 @@ describe(buildUrl.name, () => {
                 expect: {
                     username: 'user@domain',
                     password: 'pass',
-                    href: 'postgresql://user%40domain:pass@db.example.com:5432/mydb',
+                    href: 'postgresql://user%40domain:pass@db.example.com:5432/my-db',
                 },
             },
         ],

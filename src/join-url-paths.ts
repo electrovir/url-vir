@@ -70,7 +70,10 @@ export function joinUrlPaths(...urlParts: ReadonlyArray<string>): string {
                         currentEntry,
                         nextEntry,
                         nextIsQuestion
-                            ? removePrefix({value: subsequentSearchParams, prefix: '&'})
+                            ? removePrefix({
+                                  value: subsequentSearchParams,
+                                  prefix: '&',
+                              })
                             : subsequentSearchParams,
                     ].join('');
                 }

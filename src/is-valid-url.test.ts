@@ -20,12 +20,16 @@ describe(isValidUrl.name, () => {
         },
         {
             it: 'accepts valid url parts',
-            input: {href: 'https://github.com'},
+            input: {
+                href: 'https://github.com',
+            },
             expect: true,
         },
         {
             it: 'rejects invalid url parts',
-            input: {href: 'github.com'},
+            input: {
+                href: 'github.com',
+            },
             expect: false,
         },
     ]);

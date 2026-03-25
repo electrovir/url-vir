@@ -50,22 +50,34 @@ describe(searchParamsToString.name, () => {
         },
         {
             it: 'does not encode values by default',
-            inputs: [{a: 'what,five'}],
+            inputs: [
+                {
+                    a: 'what,five',
+                },
+            ],
             expect: '?a=what,five',
         },
         {
             it: 'encodes values',
             inputs: [
-                {a: 'what,-five'},
-                {encoding: UrlEncoding.Encode},
+                {
+                    a: 'what,-five',
+                },
+                {
+                    encoding: UrlEncoding.Encode,
+                },
             ],
             expect: '?a=what%2C-five',
         },
         {
             it: 'decodes values',
             inputs: [
-                {a: 'what%2C-five'},
-                {encoding: UrlEncoding.Decode},
+                {
+                    a: 'what%2C-five',
+                },
+                {
+                    encoding: UrlEncoding.Decode,
+                },
             ],
             expect: '?a=what,-five',
         },
@@ -95,7 +107,13 @@ describe(searchParamsToString.name, () => {
         },
         {
             it: 'handles empty string values',
-            inputs: [{a: 'hi', b: '', c: 'bye'}],
+            inputs: [
+                {
+                    a: 'hi',
+                    b: '',
+                    c: 'bye',
+                },
+            ],
             expect: '?a=hi&b&c=bye',
         },
         {
@@ -165,7 +183,9 @@ describe(searchParamsToObject.name, () => {
             inputs: [
                 'https://example.com?a=what,five',
             ],
-            expect: {a: ['what,five']},
+            expect: {
+                a: ['what,five'],
+            },
         },
         {
             it: 'handles multiple params',
@@ -234,8 +254,12 @@ describe(combineSearchParams.name, () => {
         {
             it: 'adds new values',
             inputs: [
-                {old: ['value']},
-                {new: ['value']},
+                {
+                    old: ['value'],
+                },
+                {
+                    new: ['value'],
+                },
             ],
             expect: {
                 new: ['value'],
@@ -245,8 +269,12 @@ describe(combineSearchParams.name, () => {
         {
             it: 'handles string values',
             inputs: [
-                {old: 'value'},
-                {new: 'value'},
+                {
+                    old: 'value',
+                },
+                {
+                    new: 'value',
+                },
             ],
             expect: {
                 new: ['value'],
@@ -256,8 +284,12 @@ describe(combineSearchParams.name, () => {
         {
             it: 'replaces values by default',
             inputs: [
-                {value: 'old'},
-                {value: 'new'},
+                {
+                    value: 'old',
+                },
+                {
+                    value: 'new',
+                },
             ],
             expect: {
                 value: ['new'],
@@ -266,8 +298,12 @@ describe(combineSearchParams.name, () => {
         {
             it: 'replaces entire string arrays',
             inputs: [
-                {value: ['old']},
-                {value: ['new']},
+                {
+                    value: ['old'],
+                },
+                {
+                    value: ['new'],
+                },
             ],
             expect: {
                 value: ['new'],
@@ -276,17 +312,27 @@ describe(combineSearchParams.name, () => {
         {
             it: 'removes undefined values',
             inputs: [
-                {value: ['old']},
-                {value: undefined},
+                {
+                    value: ['old'],
+                },
+                {
+                    value: undefined,
+                },
             ],
             expect: {},
         },
         {
             it: 'appends nothing for undefined values',
             inputs: [
-                {value: ['old']},
-                {value: undefined},
-                {searchParamStrategy: SearchParamStrategy.Append},
+                {
+                    value: ['old'],
+                },
+                {
+                    value: undefined,
+                },
+                {
+                    searchParamStrategy: SearchParamStrategy.Append,
+                },
             ],
             expect: {
                 value: ['old'],
@@ -296,8 +342,12 @@ describe(combineSearchParams.name, () => {
             it: 'appends to missing values',
             inputs: [
                 {},
-                {value: ['new']},
-                {searchParamStrategy: SearchParamStrategy.Append},
+                {
+                    value: ['new'],
+                },
+                {
+                    searchParamStrategy: SearchParamStrategy.Append,
+                },
             ],
             expect: {
                 value: ['new'],
@@ -306,9 +356,15 @@ describe(combineSearchParams.name, () => {
         {
             it: 'appends values',
             inputs: [
-                {value: 'old'},
-                {value: 'new'},
-                {searchParamStrategy: SearchParamStrategy.Append},
+                {
+                    value: 'old',
+                },
+                {
+                    value: 'new',
+                },
+                {
+                    searchParamStrategy: SearchParamStrategy.Append,
+                },
             ],
             expect: {
                 value: [
@@ -320,9 +376,16 @@ describe(combineSearchParams.name, () => {
         {
             it: 'clears values',
             inputs: [
-                {value: 'old', value2: 'another'},
-                {value: 'new'},
-                {searchParamStrategy: SearchParamStrategy.Clear},
+                {
+                    value: 'old',
+                    value2: 'another',
+                },
+                {
+                    value: 'new',
+                },
+                {
+                    searchParamStrategy: SearchParamStrategy.Clear,
+                },
             ],
             expect: {
                 value: [
