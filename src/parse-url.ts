@@ -204,8 +204,11 @@ export function parseUrl(
     const maybePort = splitIncludeSplit(withoutLogin.replace(/\/.*/, ''), ':', {
         caseSensitive: true,
     }).toReversed();
-    const trailingPort =
-        maybePort[0]?.endsWith(']') ? '' : maybePort[1] === ':' ? maybePort[0] || '' : '';
+    const trailingPort = maybePort[0]?.endsWith(']')
+        ? ''
+        : maybePort[1] === ':'
+          ? maybePort[0] || ''
+          : '';
     const withoutPort = withoutLogin.replace(new RegExp(`:${trailingPort}($|/)`), '$1');
 
     const rawHostname = withoutPort.replace(/\/.*/, '');

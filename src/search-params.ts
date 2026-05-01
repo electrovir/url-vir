@@ -136,17 +136,27 @@ export function searchParamsToObject(
 
     const searchString = rawSearchString.replace(/(^.*\?)|(#[^#]*$)/, '');
 
-    const paramEntries = searchString.split('&').map((param): [string, string | undefined] => {
-        const [
-            key,
-            ...values
-        ] = safeSplit(param, '=');
+    const paramEntries = searchString.split('&').map(
+        (
+            param,
+        ): [
+            string,
+            (
+                | string
+                | undefined
+            ),
+        ] => {
+            const [
+                key,
+                ...values
+            ] = safeSplit(param, '=');
 
-        return [
-            key,
-            values.length ? values.join('=') : undefined,
-        ];
-    });
+            return [
+                key,
+                values.length ? values.join('=') : undefined,
+            ];
+        },
+    );
 
     return paramEntries.reduce(
         (
