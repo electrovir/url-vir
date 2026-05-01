@@ -204,10 +204,22 @@ export function parseUrl(
     const maybePort = splitIncludeSplit(withoutLogin.replace(/\/.*/, ''), ':', {
         caseSensitive: true,
     }).toReversed();
-    const port = maybePort[0]?.endsWith(']') ? '' : maybePort[1] === ':' ? maybePort[0] || '' : '';
-    const withoutPort = withoutLogin.replace(new RegExp(`:${port}($|/)`), '$1');
+    const trailingPort =
+        maybePort[0]?.endsWith(']') ? '' : maybePort[1] === ':' ? maybePort[0] || '' : '';
+    const withoutPort = withoutLogin.replace(new RegExp(`:${trailingPort}($|/)`), '$1');
 
-    const hostname = withoutPort.replace(/\/.*/, '');
+    const rawHostname = withoutPort.replace(/\/.*/, '');
+
+    /**
+     * If the hostname still contains an embedded `:<digits>` suffix, that's a "first port" baked
+     * into the host string (e.g. `example.com:5432:5432`). Per the parser's contract, the first
+     * port wins: strip it from the hostname and use it as the port instead.
+     */
+    const embeddedPortMatch = rawHostname.endsWith(']')
+        ? undefined
+        : rawHostname.match(/^(?<host>.*):(?<port>\d+)$/);
+    const hostname = embeddedPortMatch?.groups?.host ?? rawHostname;
+    const port = embeddedPortMatch?.groups?.port ?? trailingPort;
     const withoutHost = withoutLogin.replace(/^[^/]*(\/|$)/, '$1');
 
     const pathname = codeValue(withoutHost.replace(/^[^/]*(?:\/|$)/, '/'), options);

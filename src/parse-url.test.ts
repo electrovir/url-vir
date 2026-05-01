@@ -370,6 +370,48 @@ describe(parseUrl.name, () => {
             },
         },
         {
+            it: 'collapses two consecutive identical ports to the first',
+            inputs: [
+                'postgresql://user:pass@example.com:5432:5432/db',
+            ],
+            expect: {
+                ...emptyUrlParts,
+                fullPath: '/db',
+                host: 'example.com:5432',
+                hostname: 'example.com',
+                href: 'postgresql://user:pass@example.com:5432/db',
+                origin: 'postgresql://example.com:5432',
+                password: 'pass',
+                pathname: '/db',
+                paths: [
+                    'db',
+                ],
+                port: '5432',
+                protocol: 'postgresql',
+                username: 'user',
+            },
+        },
+        {
+            it: 'uses the first port when two different ports are stacked',
+            inputs: [
+                'postgresql://example.com:5432:6000/db',
+            ],
+            expect: {
+                ...emptyUrlParts,
+                fullPath: '/db',
+                host: 'example.com:5432',
+                hostname: 'example.com',
+                href: 'postgresql://example.com:5432/db',
+                origin: 'postgresql://example.com:5432',
+                pathname: '/db',
+                paths: [
+                    'db',
+                ],
+                port: '5432',
+                protocol: 'postgresql',
+            },
+        },
+        {
             it: 'handles example url',
             inputs: [
                 'https://example.com:123/hello/there',
