@@ -9,6 +9,8 @@ import {mockUrlParts, mockUrlString} from './url-parts.mock.js';
 describe('UrlOverrides', () => {
     it('is assignable to from UrlParts', () => {
         const testAssignment: Readonly<UrlOverrides> = {} as Readonly<UrlParts>;
+
+        assert.tsType<Readonly<UrlParts>>().matches<typeof testAssignment>();
     });
 });
 

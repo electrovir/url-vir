@@ -18,15 +18,25 @@ const protocolSplit = '://';
  */
 export function joinUrlPaths(...urlParts: ReadonlyArray<string>): string {
     const rawJoined = urlParts.join('/');
+    /**
+     * Split on only the _first_ `://`: any later `://` (e.g. a full URL passed as a path segment)
+     * is part of the path, not another protocol separator. Splitting on every `://` would discard
+     * everything after the second one.
+     */
+    const protocolSplitIndex = rawJoined.indexOf(protocolSplit);
     const [
         protocol,
-        rawRest = '',
-    ] = rawJoined.includes(protocolSplit)
-        ? rawJoined.split(protocolSplit)
-        : [
-              '',
-              rawJoined,
-          ];
+        rawRest,
+    ] =
+        protocolSplitIndex === -1
+            ? [
+                  '',
+                  rawJoined,
+              ]
+            : [
+                  rawJoined.slice(0, protocolSplitIndex),
+                  rawJoined.slice(protocolSplitIndex + protocolSplit.length),
+              ];
 
     let reduceSearchParamsStarted = false;
     const fixedRest = rawRest

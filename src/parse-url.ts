@@ -5,6 +5,19 @@ import {type UrlOptions, codeValue} from './url-options.js';
 import {type UrlParts} from './url-parts.js';
 
 /**
+ * Schemes that browsers treat as "special": within these, a backslash is equivalent to a forward
+ * slash in the scheme, authority, and path (but not the query or fragment).
+ */
+const specialSchemes = [
+    'ftp',
+    'file',
+    'http',
+    'https',
+    'ws',
+    'wss',
+];
+
+/**
  * Combined the needed URL parts into a URL's full href.
  *
  * @category Internal
@@ -173,7 +186,13 @@ export function parseUrl(
               prefix: '#',
           })
         : '';
-    const withoutHash = urlString.replace(/#[^#]*$/, '');
+    /**
+     * Strip from the _first_ `#`, matching how `rawHash` above extracts everything after the first
+     * `#`. Stripping from the last `#` instead would leak an earlier `#...#` segment into the
+     * pathname when a URL contains more than one `#`.
+     */
+    const hashIndex = urlString.indexOf('#');
+    const withoutHash = hashIndex === -1 ? urlString : urlString.slice(0, hashIndex);
 
     const rawSearch = withoutHash.replace(/^[^?]*(?:\?|$)/, '');
     const search = rawSearch
@@ -182,16 +201,48 @@ export function parseUrl(
               prefix: '?',
           })
         : '';
-    const withoutSearch = withoutHash.replace(/\?[^?]*$/, '');
+    /**
+     * Strip from the _first_ `?`, matching how `rawSearch` above extracts everything after the
+     * first `?`. Stripping from the last `?` instead would leak the query into the pathname when a
+     * query value itself contains a `?` (e.g. `?redirect=a?b`), producing a doubled `href`.
+     */
+    const searchIndex = withoutHash.indexOf('?');
+    const withoutSearch = searchIndex === -1 ? withoutHash : withoutHash.slice(0, searchIndex);
 
     const protocol = withoutSearch.includes('://') ? withoutSearch.replace(/:\/\/.*$/, '') : '';
-    const withoutProtocol = withoutSearch
-        .replace(/^.*:\/\//, '')
-        /** Remove duplicate consecutive slashes. */
-        .replace(/\/\//g, '/');
-    const login = withoutProtocol.replace(/@.*/, '');
-    const withoutLogin = withoutProtocol.replace(/^[^@]*@/, '');
-    const hasLogin = login !== withoutLogin;
+    /**
+     * For a "special" scheme, browsers treat backslashes as forward slashes in the scheme,
+     * authority, and path (the query and fragment, already removed above, are left alone). Matching
+     * that prevents host confusion like `https://vendor.com\@evil.com` resolving to `evil.com`
+     * instead of the browser's `vendor.com`.
+     */
+    const cleanedWithoutSearch = specialSchemes.includes(protocol.toLowerCase())
+        ? withoutSearch.replace(/\\/g, '/')
+        : withoutSearch;
+    const withoutProtocol = cleanedWithoutSearch
+        /**
+         * Strip only up to the _first_ `://` (note the lazy `.*?`). A browser resolves the host
+         * from the first `://`, so a URL with another `://` embedded in its path (e.g.
+         * `https://evil.com/x/https://vendor.com`) navigates to `evil.com`, not the trailing host.
+         * A greedy `.*` here would strip up to the last `://` and resolve the wrong host, which
+         * would let an off-host link slip past a hostname allow-list.
+         */
+        .replace(/^.*?:\/\//, '')
+        /**
+         * Collapse every run of consecutive slashes to a single slash. This normalizes away empty
+         * path segments (so `paths` never contains `''`) and keeps protocol-relative input
+         * (`//example.com/path`) parsing as a path.
+         */
+        .replace(/\/{2,}/g, '/');
+    /**
+     * Userinfo (`user:pass@`) is only recognized within the authority — the part before the first
+     * `/`. An `@` later in the path (e.g. `https://host.com/@handle`) is path content, not a login
+     * separator, so it must not shift which host is resolved.
+     */
+    const authority = withoutProtocol.replace(/^\/*/, '').replace(/\/.*/, '');
+    const hasLogin = authority.includes('@');
+    const login = hasLogin ? withoutProtocol.replace(/@.*/, '') : '';
+    const withoutLogin = hasLogin ? withoutProtocol.replace(/^[^@]*@/, '') : withoutProtocol;
     const [
         rawPassword,
         ...rawUsernameParts

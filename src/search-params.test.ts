@@ -166,6 +166,10 @@ describe(searchParamsToObject.name, () => {
             },
         },
         {
+            /**
+             * The `#0` is the fragment, not part of the `sort` value, so it is stripped before the
+             * remaining value is encoded.
+             */
             it: 'encodes',
             inputs: [
                 'http://example.com/page?filters=Content.Type-0,1,2&sort=Number.#0',
@@ -175,7 +179,7 @@ describe(searchParamsToObject.name, () => {
             ],
             expect: {
                 filters: ['Content.Type-0%2C1%2C2'],
-                sort: ['Number.%230'],
+                sort: ['Number.'],
             },
         },
         {
@@ -236,6 +240,63 @@ describe(searchParamsToObject.name, () => {
             expect: {
                 hello: ['there'],
                 cheese: [''],
+            },
+        },
+        {
+            it: 'keeps a value that contains a question mark',
+            inputs: ['?q=a?b'],
+            expect: {
+                q: ['a?b'],
+            },
+        },
+        {
+            it: 'keeps an embedded redirect url with its own query',
+            inputs: ['?redirect=https://y.com?z=1&next=2'],
+            expect: {
+                redirect: ['https://y.com?z=1'],
+                next: ['2'],
+            },
+        },
+        {
+            it: 'returns nothing for a lone question mark',
+            inputs: ['?'],
+            expect: {},
+        },
+        {
+            it: 'ignores a leading ampersand',
+            inputs: ['?&a=b'],
+            expect: {
+                a: ['b'],
+            },
+        },
+        {
+            it: 'ignores a trailing ampersand',
+            inputs: ['?a=1&'],
+            expect: {
+                a: ['1'],
+            },
+        },
+        {
+            it: 'ignores a doubled ampersand',
+            inputs: ['?a=1&&b=2'],
+            expect: {
+                a: ['1'],
+                b: ['2'],
+            },
+        },
+        {
+            it: 'strips the fragment from a search string',
+            inputs: ['?a=b#frag'],
+            expect: {
+                a: ['b'],
+            },
+        },
+        {
+            it: 'strips the fragment from a full url string',
+            inputs: ['https://x.com/p?a=b&c=d#frag'],
+            expect: {
+                a: ['b'],
+                c: ['d'],
             },
         },
     ]);

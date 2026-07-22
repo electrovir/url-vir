@@ -46,6 +46,7 @@ export type SearchParamsInput = Record<string, MaybeArray<Exclude<Primitive, sym
  *
  * @category Util
  */
+// eslint-disable-next-line @virmator/prefer-params-object
 export function combineSearchParams(
     baseParams: Readonly<SearchParamsInput>,
     newParams: Readonly<SearchParamsInput>,
@@ -134,29 +135,52 @@ export function searchParamsToObject(
           ? input.toString()
           : input.search;
 
-    const searchString = rawSearchString.replace(/(^.*\?)|(#[^#]*$)/, '');
+    /**
+     * A `#` starts the fragment, which is not part of the search, so strip from the first `#`
+     * (consistent with `parseUrl` and browsers). This must happen before the prefix is removed
+     * below: the two can't be combined into one alternation because only the first alternative of a
+     * single non-global replace fires.
+     */
+    const fragmentIndex = rawSearchString.indexOf('#');
+    const withoutFragment =
+        fragmentIndex === -1 ? rawSearchString : rawSearchString.slice(0, fragmentIndex);
+    /**
+     * Strip the prefix up to and including the _first_ `?`. A greedy `^.*\?` would strip up to the
+     * _last_ `?`, dropping every param before a `?` that appears inside a query value (e.g. a
+     * `redirect=https://x.com?y=1` param). A `URLSearchParams` string has no `?`, so it is left
+     * intact.
+     */
+    const searchString = withoutFragment.replace(/^[^?]*\?/, '');
 
-    const paramEntries = searchString.split('&').map(
-        (
-            param,
-        ): [
-            string,
+    const paramEntries = searchString
+        /**
+         * Drop empty segments so a lone `?`, leading/trailing `&`, or doubled `&&` doesn't produce
+         * a spurious empty-string key (matching how the browser's `URLSearchParams` ignores them).
+         * A segment like `=value` is not empty and is preserved as an empty-key param.
+         */
+        .split('&')
+        .filter((param) => param !== '')
+        .map(
             (
-                | string
-                | undefined
-            ),
-        ] => {
-            const [
-                key,
-                ...values
-            ] = safeSplit(param, '=');
+                param,
+            ): [
+                string,
+                string | undefined,
+            ] => {
+                const [
+                    key,
+                    ...values
+                ] = safeSplit({
+                    value: param,
+                    splitter: '=',
+                });
 
-            return [
-                key,
-                values.length ? values.join('=') : undefined,
-            ];
-        },
-    );
+                return [
+                    key,
+                    values.length ? values.join('=') : undefined,
+                ];
+            },
+        );
 
     return paramEntries.reduce(
         (

@@ -117,5 +117,18 @@ describe(joinUrlPaths.name, () => {
             ],
             expect: 'https/wikipedia.org/start',
         },
+        {
+            /**
+             * A later segment containing `://` is path content, not a second protocol separator, so
+             * it must not be discarded.
+             */
+            it: 'does not drop a segment that contains a protocol separator',
+            inputs: [
+                'https://a.com',
+                'x',
+                'https://b.com',
+            ],
+            expect: 'https://a.com/x/https:/b.com',
+        },
     ]);
 });
