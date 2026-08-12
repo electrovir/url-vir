@@ -180,6 +180,8 @@ export function createOrigin({
  *     href: 'https://example.com:123/hello/there',
  * };
  * ```
+ *
+ * @throws `URIError` If a URL part contains malformed percent-encoding while being decoded.
  */
 export function parseUrl(
     url: string | URL,

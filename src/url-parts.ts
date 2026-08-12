@@ -8,7 +8,7 @@ import {searchParamsShape} from './search-params.js';
  * @category Util
  */
 export const urlPartsShape = defineShape({
-    /** Http, https, wss, etc. */
+    /** Http, https, wss, etc. without the trailing `;`. */
     protocol: '',
     /**
      * Infrequently used username part of a url.
