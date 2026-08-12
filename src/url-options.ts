@@ -1,5 +1,5 @@
+import {type Primitive} from '@augment-vir/common';
 import {defineShape, enumShape, optionalShape, unionShape} from 'object-shape-tester';
-import {type Primitive} from 'type-fest';
 
 /**
  * Determines whether url parsing should using encoding, decoding, or neither.

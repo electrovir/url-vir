@@ -7,10 +7,11 @@ import {
     getOrSet,
     mapObjectValues,
     type MaybeArray,
+    type Primitive,
+    type ReadonlyDeep,
     safeSplit,
 } from '@augment-vir/common';
 import {defineShape, recordShape} from 'object-shape-tester';
-import {type Primitive, type ReadonlyDeep} from 'type-fest';
 import {codeValue, codeValues, SearchParamStrategy, type UrlOptions} from './url-options.js';
 
 /**
