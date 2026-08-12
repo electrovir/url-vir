@@ -6,6 +6,10 @@ export const mockUrlParts: UrlParts = {
     hash: '#time-to-go',
     host: 'example.com:8765',
     hostname: 'example.com',
+    domains: [
+        'example',
+        'com',
+    ],
     href: mockUrlString,
     origin: 'https://example.com:8765',
     password: 'pass',

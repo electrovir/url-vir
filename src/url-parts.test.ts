@@ -9,6 +9,7 @@ describe('emptyUrlParts', () => {
             hash: '',
             host: '',
             hostname: '',
+            domains: [],
             href: '/',
             origin: '',
             password: '',

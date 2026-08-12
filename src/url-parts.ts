@@ -32,6 +32,8 @@ export const urlPartsShape = defineShape({
     host: '',
     /** Domain, subdomains, and TLD (.com). */
     hostname: '',
+    /** Each hostname domain without its separating dot. */
+    domains: [''],
     /** Port part of the URL. If none exist, this will be an empty string. */
     port: '',
     /**

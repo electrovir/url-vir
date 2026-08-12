@@ -16,6 +16,7 @@ import {
 } from 'object-shape-tester';
 import {joinUrlPaths} from './join-url-paths.js';
 import {
+    createDomains,
     createFullPath,
     createHost,
     createHref,
@@ -58,6 +59,7 @@ export const urlOverridesShape = defineShape({
         ),
     ),
     hostname: optionalShape(unionShape(undefined, '')),
+    domains: optionalShape(unionShape(undefined, [''])),
     pathname: optionalShape(unionShape(undefined, '')),
     paths: optionalShape(unionShape(undefined, [''])),
     protocol: optionalShape(unionShape(undefined, '')),
@@ -156,7 +158,12 @@ export function buildUrl(
 
     const override: ReadonlyDeep<UrlOverrides> =
         check.isString(rawOverride) || check.instanceOf(rawOverride, URL)
-            ? filterObject(parseUrl(rawOverride), (key, value) => check.isTruthy(value))
+            ? filterObject(parseUrl(rawOverride), (key, value) => {
+                  return (
+                      check.isTruthy(value) &&
+                      (key !== 'domains' || (check.isArray(value) && value.length !== 0))
+                  );
+              })
             : rawOverride;
 
     const options: Readonly<UrlOptions> | undefined = hasThirdOptions
@@ -177,7 +184,9 @@ export function buildUrl(
 
             const overridePart = override[key];
 
-            if (check.isNumber(overridePart)) {
+            if (check.isArray(overridePart)) {
+                return overridePart;
+            } else if (check.isNumber(overridePart)) {
                 return String(overridePart);
             } else if (check.isString(overridePart)) {
                 if (key === 'hash' && overridePart) {
@@ -198,6 +207,11 @@ export function buildUrl(
             }
         },
     ) as Record<keyof UrlParts, string | SearchParams | string[]> as Writable<UrlParts>;
+
+    if (check.hasKey(override, 'domains') && check.isArray(override.domains)) {
+        baseUrlParts.hostname = override.domains.join('.');
+    }
+    baseUrlParts.domains = createDomains(baseUrlParts);
 
     if (check.hasKey(override, 'paths') && override.paths) {
         baseUrlParts.pathname = joinUrlPaths(

@@ -94,6 +94,10 @@ describe(buildUrl.name, () => {
                 ...emptyUrlParts,
                 host: 'example.com:9786',
                 hostname: 'example.com',
+                domains: [
+                    'example',
+                    'com',
+                ],
                 port: '9786',
                 origin: 'https://example.com:9786',
                 href: 'https://example.com:9786/',
@@ -112,6 +116,10 @@ describe(buildUrl.name, () => {
                 ...emptyUrlParts,
                 host: 'example.com',
                 hostname: 'example.com',
+                domains: [
+                    'example',
+                    'com',
+                ],
                 origin: 'https://example.com',
                 href: 'https://example.com/no-slash',
                 protocol: 'https',
@@ -134,10 +142,41 @@ describe(buildUrl.name, () => {
                 paths: ['new-path'],
                 host: 'example.com',
                 hostname: 'example.com',
+                domains: [
+                    'example',
+                    'com',
+                ],
                 origin: 'https://example.com',
                 href: 'https://example.com/new-path',
                 protocol: 'https',
                 pathname: '/new-path',
+            },
+        },
+        {
+            it: 'builds a hostname from domains',
+            inputs: [
+                '',
+                {
+                    domains: [
+                        'api',
+                        'staging',
+                        'example',
+                        'com',
+                    ],
+                },
+            ],
+            expect: {
+                ...emptyUrlParts,
+                domains: [
+                    'api',
+                    'staging',
+                    'example',
+                    'com',
+                ],
+                host: 'api.staging.example.com',
+                hostname: 'api.staging.example.com',
+                href: 'api.staging.example.com/',
+                origin: 'api.staging.example.com',
             },
         },
         {
@@ -194,6 +233,10 @@ describe(buildUrl.name, () => {
                 password: '',
                 host: 'example.com',
                 hostname: 'example.com',
+                domains: [
+                    'example',
+                    'com',
+                ],
                 port: '',
                 origin: 'https://example.com',
                 pathname: '/',
@@ -261,6 +304,10 @@ describe(buildUrl.name, () => {
             ],
             expect: {
                 ...mockUrlParts,
+                domains: [
+                    'github',
+                    'com',
+                ],
                 hostname: 'github.com',
                 origin: 'https://github.com:8765',
                 host: 'github.com:8765',
@@ -277,6 +324,10 @@ describe(buildUrl.name, () => {
             ],
             expect: {
                 ...mockUrlParts,
+                domains: [
+                    'github',
+                    'com',
+                ],
                 hostname: 'github.com',
                 origin: 'https://github.com:8765',
                 host: 'github.com:8765',
@@ -294,6 +345,10 @@ describe(buildUrl.name, () => {
                 hash: '',
                 host: 'example.com',
                 hostname: 'example.com',
+                domains: [
+                    'example',
+                    'com',
+                ],
                 href: 'example.com/absolute-path',
                 origin: 'example.com',
                 password: '',
@@ -319,6 +374,10 @@ describe(buildUrl.name, () => {
                 hash: '',
                 host: 'example.com',
                 hostname: 'example.com',
+                domains: [
+                    'example',
+                    'com',
+                ],
                 href: 'example.com/path/relative-path?something=hi',
                 origin: 'example.com',
                 password: '',
@@ -362,6 +421,9 @@ describe(buildUrl.name, () => {
                 searchParams: {},
                 username: '',
                 hostname: '[::1]',
+                domains: [
+                    '[::1]',
+                ],
                 origin: 'https://[::1]:3000',
                 host: '[::1]:3000',
                 href: 'https://[::1]:3000/hi/bye',
@@ -393,6 +455,9 @@ describe(buildUrl.name, () => {
                 searchParams: {},
                 username: 'user',
                 hostname: '[::1]',
+                domains: [
+                    '[::1]',
+                ],
                 origin: 'https://[::1]:3000',
                 host: '[::1]:3000',
                 href: 'https://user:pass@[::1]:3000/hi/bye',
@@ -468,6 +533,10 @@ describe(buildUrl.name, () => {
             {
                 ...emptyUrlParts,
                 hostname: 'example.com',
+                domains: [
+                    'example',
+                    'com',
+                ],
                 href: 'example.com/?hello=there',
                 origin: 'example.com',
                 host: 'example.com',

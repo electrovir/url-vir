@@ -112,6 +112,15 @@ export function createHost({
 }
 
 /**
+ * Split `hostname` into its dot-separated domains.
+ *
+ * @category Internal
+ */
+export function createDomains({hostname}: Readonly<Pick<UrlParts, 'hostname'>>) {
+    return hostname ? hostname.split('.') : [];
+}
+
+/**
  * Combined the needed URL parts into a URL origin.
  *
  * @category Internal
@@ -153,6 +162,10 @@ export function createOrigin({
  *     password: '',
  *     host: 'example.com:123',
  *     hostname: 'example.com',
+ *     domains: [
+ *         'example',
+ *         'com',
+ *     ],
  *     port: '123',
  *     origin: 'https://example.com:123',
  *     pathname: '/hello/there',
@@ -273,6 +286,9 @@ export function parseUrl(
         ? undefined
         : rawHostname.match(/^(?<host>.*):(?<port>\d+)$/);
     const hostname = embeddedPortMatch?.groups?.host ?? rawHostname;
+    const domains = createDomains({
+        hostname,
+    });
     const port = embeddedPortMatch?.groups?.port ?? trailingPort;
     const withoutHost = withoutLogin.replace(/^[^/]*(\/|$)/, '$1');
 
@@ -314,6 +330,7 @@ export function parseUrl(
         hash,
         host,
         hostname,
+        domains,
         href,
         origin,
         password,
