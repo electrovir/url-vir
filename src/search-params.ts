@@ -218,7 +218,9 @@ export function searchParamsToObject(
      * Spread into a fresh object so the returned value has a normal prototype; spread creates own
      * data properties, so even a `__proto__` key stays an own key.
      */
-    return {...searchParams};
+    return {
+        ...searchParams,
+    };
 }
 
 function wrapParamValue(
