@@ -808,6 +808,7 @@ describe('parseUrl resolves the same host as the browser', () => {
             'https://sub.example.com:8080/a/https://b.com/c',
             'https://[::1]:3000/x/https://vendor.com',
             'https://vendor.com/@evil.com/path',
+            'https://vendor.com:8080@evil.com/path',
             String.raw`https://vendor.com\@evil.com/path`,
             String.raw`https://a.com\b\c`,
             'https://a.com/x//y///z',

@@ -254,10 +254,20 @@ export function parseUrl(
      * `/`. An `@` later in the path (e.g. `https://host.com/@handle`) is path content, not a login
      * separator, so it must not shift which host is resolved.
      */
-    const authority = withoutProtocol.replace(/^\/*/, '').replace(/\/.*/, '');
-    const hasLogin = authority.includes('@');
-    const login = hasLogin ? withoutProtocol.replace(/@.*/, '') : '';
-    const withoutLogin = hasLogin ? withoutProtocol.replace(/^[^@]*@/, '') : withoutProtocol;
+    const authorityOffset = withoutProtocol.length - withoutProtocol.replace(/^\/*/, '').length;
+    const authority = withoutProtocol.slice(authorityOffset).replace(/\/.*/, '');
+    /**
+     * Split userinfo from the host at the _last_ `@` in the authority, matching the WHATWG
+     * authority parser. Splitting at the first `@` instead would let
+     * `https://a@vendor.com@evil.com` report `vendor.com` as the hostname while a browser resolves
+     * `evil.com`, bypassing hostname allow-lists.
+     */
+    const loginEndIndex = authority.lastIndexOf('@');
+    const hasLogin = loginEndIndex !== -1;
+    const login = hasLogin ? withoutProtocol.slice(0, authorityOffset + loginEndIndex) : '';
+    const withoutLogin = hasLogin
+        ? withoutProtocol.slice(authorityOffset + loginEndIndex + 1)
+        : withoutProtocol;
     const [
         rawPassword,
         ...rawUsernameParts
@@ -267,17 +277,20 @@ export function parseUrl(
     );
     const password = decodeURIComponent(rawPassword?.replace(/[/:]/g, '') || '');
 
-    const maybePort = splitIncludeSplit(withoutLogin.replace(/\/.*/, ''), ':', {
+    const hostAndPort = withoutLogin.replace(/\/.*/, '');
+    const maybePort = splitIncludeSplit(hostAndPort, ':', {
         caseSensitive: true,
     }).toReversed();
-    const trailingPort = maybePort[0]?.endsWith(']')
-        ? ''
-        : maybePort[1] === ':'
-          ? maybePort[0] || ''
-          : '';
-    const withoutPort = withoutLogin.replace(new RegExp(`:${trailingPort}($|/)`), '$1');
-
-    const rawHostname = withoutPort.replace(/\/.*/, '');
+    const hasTrailingPort = !maybePort[0]?.endsWith(']') && maybePort[1] === ':';
+    const trailingPort = hasTrailingPort ? maybePort[0] || '' : '';
+    /**
+     * Strip the trailing `:<port>` structurally by length rather than via an interpolated RegExp,
+     * so untrusted port text can never act as a pattern and remove more of the authority than the
+     * port itself.
+     */
+    const rawHostname = hasTrailingPort
+        ? hostAndPort.slice(0, hostAndPort.length - trailingPort.length - 1)
+        : hostAndPort;
 
     /**
      * If the hostname still contains an embedded `:<digits>` suffix, that's a "first port" baked

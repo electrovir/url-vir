@@ -183,7 +183,13 @@ export function searchParamsToObject(
             },
         );
 
-    return paramEntries.reduce(
+    /**
+     * The accumulator must not inherit from `Object.prototype`: for an untrusted key like
+     * `toString` or `constructor`, `getOrSet` would find the inherited member and crash calling
+     * `.push` on it, and assigning to `__proto__` on a plain object would mutate the prototype
+     * instead of creating an own property.
+     */
+    const searchParams: SearchParams = paramEntries.reduce(
         (
             accum: SearchParams,
             [
@@ -205,8 +211,14 @@ export function searchParamsToObject(
 
             return accum;
         },
-        {},
+        Object.create(null) as SearchParams,
     );
+
+    /**
+     * Spread into a fresh object so the returned value has a normal prototype; spread creates own
+     * data properties, so even a `__proto__` key stays an own key.
+     */
+    return {...searchParams};
 }
 
 function wrapParamValue(
